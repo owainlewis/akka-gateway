@@ -21,7 +21,7 @@ class ReverseProxy {
     val proxyRequest = request.copy(uri="http://owainlewis.com").removeHeader(TimeoutAccessHeader)
     http.singleRequest(proxyRequest)
   }
-  
+
   def start(host: String, port: Int) {
     println(s"Switch server started on localhost:$port")
     Http().bindAndHandleAsync(proxyHandler, host, port)
