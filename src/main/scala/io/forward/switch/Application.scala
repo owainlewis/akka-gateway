@@ -1,15 +1,18 @@
-# Switch
+package io.forward.switch
 
-Switch is a library for writing customizable API Gateways using AKka HTTP.
+import akka.actor.ActorSystem
+import akka.http.scaladsl.Http
+import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.Route
+import akka.stream.ActorMaterializer
+import com.typesafe.config.ConfigFactory
+import io.forward.switch.core.HttpUpstream
 
-## Getting started
+import scala.concurrent.ExecutionContext
 
-### Request Filters
-
-### Response Filters
-
-```scala
 object Application extends App with ReverseProxy {
+  val config = ConfigFactory.load()
+
   implicit val system: ActorSystem = ActorSystem()
   implicit val materializer: ActorMaterializer = ActorMaterializer()
   implicit val executionContext: ExecutionContext = system.dispatcher
@@ -37,4 +40,3 @@ object Application extends App with ReverseProxy {
   /** Run the server **/
   Http().bindAndHandle(routes, interface = "localhost", port = 8080)
 }
-```
