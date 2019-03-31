@@ -5,6 +5,7 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.headers.{Host, `Timeout-Access`}
 import akka.http.scaladsl.model.{HttpRequest, HttpResponse, Uri}
 import akka.stream.Materializer
+import io.forward.switch.filters.RequestFilter
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
@@ -13,9 +14,7 @@ trait Upstream {
   def apply(request: HttpRequest): Future[HttpResponse]
 }
 
-class HttpUpstream(target: Uri)(implicit system: ActorSystem,
-                                ex: ExecutionContext,
-                                materializer: Materializer) extends Upstream {
+class HttpUpstream[T](target: Uri, requestFilter: Option[RequestFilter] = None)(implicit system: ActorSystem, ex: ExecutionContext, materializer: Materializer) extends Upstream {
   private val defaultTimeout = 20.seconds
 
   def address(request: HttpRequest): HttpRequest = {
@@ -27,19 +26,30 @@ class HttpUpstream(target: Uri)(implicit system: ActorSystem,
   /**
     * TODO investigate connection reset error here with entity
     *
-    * @param request
+    * Apply all request filters, dispatch the request and run response filters when appropriate
+    *
+    * @param request A HTTP request to proxy
     * @param system
     * @param ex
     * @param materializer
     * @return
     */
   def apply(request: HttpRequest): Future[HttpResponse] = {
-    val outboundRequest = address(request)
-    val response = Http().singleRequest(outboundRequest)
-    response.flatMap { r =>
-      r.entity.withoutSizeLimit().toStrict(defaultTimeout).flatMap { e =>
-        response
+    val proxyRequest = address(request)
+
+    requestFilter match {
+      case Some(filter) => filter.apply(proxyRequest) flatMap {
+        case Left(resp) => Future.successful(resp)
+        case Right(req) => proxyHttpRequest(req)
       }
+      case None => proxyHttpRequest(proxyRequest)
     }
   }
+
+  private def proxyHttpRequest(request: HttpRequest): Future[HttpResponse] =
+    Http(system).singleRequest(request) flatMap { response =>
+      response.entity.withoutSizeLimit().toStrict(defaultTimeout).flatMap { _ =>
+        Future.successful(response)
+      }
+    }
 }

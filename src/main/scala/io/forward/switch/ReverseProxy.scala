@@ -7,6 +7,7 @@ import io.forward.switch.core.Upstream
 import scala.util.{Failure, Success}
 
 trait ReverseProxy {
+
   def proxyTo(upstream: Upstream): Route =
     extractRequest { request =>
       onComplete(upstream.apply(request)) {
