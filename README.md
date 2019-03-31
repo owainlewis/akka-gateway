@@ -20,7 +20,7 @@ object Application extends App with ReverseProxy {
     val barUpstream = new HttpUpstream("https://jsonplaceholder.typicode.com/todos/1")
   }
 
-  val routes: Route =
+  val gateway: Route =
     path("foo") {
       get {
         extractRequestContext { ctx =>
@@ -35,6 +35,6 @@ object Application extends App with ReverseProxy {
     }
 
   /** Run the server **/
-  Http().bindAndHandle(routes, interface = "localhost", port = 8080)
+  Http().bindAndHandle(gateway, interface = "localhost", port = 8080)
 }
 ```

@@ -13,7 +13,9 @@ trait Upstream {
   def apply(request: HttpRequest): Future[HttpResponse]
 }
 
-class HttpUpstream(target: Uri)(implicit system: ActorSystem, ex: ExecutionContext, materializer: Materializer) extends Upstream {
+class HttpUpstream(target: Uri)(implicit system: ActorSystem,
+                                ex: ExecutionContext,
+                                materializer: Materializer) extends Upstream {
   private val defaultTimeout = 20.seconds
 
   def address(request: HttpRequest): HttpRequest = {
