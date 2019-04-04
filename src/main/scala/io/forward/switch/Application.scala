@@ -11,7 +11,7 @@ import io.forward.switch.filters.{HeaderModifyingRequestFilter, NoOpRequestFilte
 
 import scala.concurrent.ExecutionContext
 
-object Application extends App with ReverseProxy {
+object Application extends App {
   val config = ConfigFactory.load()
 
   implicit val system: ActorSystem = ActorSystem()
@@ -27,15 +27,9 @@ object Application extends App with ReverseProxy {
   val routes: Route =
     path("foo") {
       get {
-        extractRequestContext { ctx =>
-          ctx.log.info("Proxying to Foo upstream")
-          proxyTo(Upstreams.fooUpstream)
+          val filterChain = new FilterChain(NoOpPreFilter, NoOpPostFilter)
+          filterChain.apply(Upstreams.fooUpstream)
         }
-      }
-    } ~ path("bar") {
-      get {
-        proxyTo(Upstreams.barUpstream)
-      }
     }
 
   /** Run the server **/

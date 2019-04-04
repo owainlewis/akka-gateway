@@ -36,14 +36,7 @@ class HttpUpstream[T](target: Uri, requestFilter: Option[RequestFilter] = None)(
     */
   def apply(request: HttpRequest): Future[HttpResponse] = {
     val proxyRequest = address(request)
-
-    requestFilter match {
-      case Some(filter) => filter.apply(proxyRequest) flatMap {
-        case Left(resp) => Future.successful(resp)
-        case Right(req) => proxyHttpRequest(req)
-      }
-      case None => proxyHttpRequest(proxyRequest)
-    }
+    proxyHttpRequest(proxyRequest)
   }
 
   private def proxyHttpRequest(request: HttpRequest): Future[HttpResponse] =
