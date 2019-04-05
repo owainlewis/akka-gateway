@@ -21,9 +21,18 @@ trait PreFilter {
 }
 
 object NoOpPreFilter extends PreFilter {
-  def apply(request: HttpRequest) =
-    Future.successful(Left(HttpResponse(status = StatusCodes.Created)))
+  def apply(request: HttpRequest): Future[Either[HttpResponse, HttpRequest]] =
+    Future.successful(Left(HttpResponse(status = StatusCodes.OK)))
 }
+
+object HeaderAuthenticatingPreFilter extends PreFilter {
+  override def apply(request: HttpRequest): Future[Either[HttpResponse, HttpRequest]] = {
+    val notAuthorized = Left(HttpResponse(status = StatusCodes.Unauthorized))
+    Future.successful(notAuthorized)
+  }
+}
+
+////////////////////////////////////////////////
 
 trait PostFilter[-RequestData] {
   def apply(request: HttpRequest, response: HttpResponse, data: RequestData): Future[HttpResponse]

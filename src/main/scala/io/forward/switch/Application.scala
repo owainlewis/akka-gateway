@@ -2,7 +2,7 @@ package io.forward.switch
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
-import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.Directives.{get, path}
 import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
 import com.typesafe.config.ConfigFactory
@@ -26,9 +26,9 @@ object Application extends App {
   val routes: Route =
     path("foo") {
       get {
-          val filterChain = new FilterChain(NoOpPreFilter, NoOpPostFilter)
-          filterChain.apply(Upstreams.fooUpstream)
-        }
+        val filterChain = new FilterChain(HeaderAuthenticatingPreFilter, NoOpPostFilter)
+        filterChain.apply(Upstreams.fooUpstream)
+      }
     }
 
   /** Run the server **/
