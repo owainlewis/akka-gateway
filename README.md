@@ -2,16 +2,18 @@
 
 Switch is a library for writing bespoke API Gateways using AKka HTTP. It supports
 
-- Core
+## Core
   - Rate limiting
-  - Authentication
   - Fan out request patterns
   - Validation
   - Response transformation
   - Load Balancing
   - Websockets
 
-- Cloud Provider
+## Authentication
+  - Auth0
+
+## Cloud Provider
   - AWS
     - Lambda
     - S3
@@ -26,24 +28,25 @@ HTTPRequest -> PreFilter[HttpRequest] -> (Return || Dispatch Upstream) -> PostFi
 ## Getting started
 
 ```scala
-object Application extends App {
-  import DefaultImplicits._
+object SimpleGateway extends App with DefaultImplicits {
 
-  val transfomer = new HeaderTransformer(scala.collection.immutable.Seq(RawHeader("X-Foo", "123")))
-  val headerPreFilter = new RequestTransformingPreFilter(transfomer)
+  object FooBackend {
+    private val headerTransform = HeaderTransformer(add = Seq(RawHeader("X-Foo", "123")), remove = Seq("X-Bar"))
+    private val headerPreFilter = RequestTransformingPreFilter(headerTransform)
 
-  val gateway: Route =
+    val route: Route = FilterChain(headerPreFilter, NoOpPostFilter)
+      .apply(HttpBackend("https://postman-echo.com/get"))
+  }
+
+  val routes: Route =
     path("foo") {
       get {
-        FilterChain(headerPreFilter, NoOpPostFilter)
-          .apply(HttpUpstream("https://postman-echo.com/get"))
+        FooBackend.route
       }
     }
 
-  /** Run the server **/
-  Http().bindAndHandle(gateway, interface = "localhost", port = 8080)
+  Http().bindAndHandle(routes, interface = "localhost", port = 8080)
 }
-
 ```
 
 ### Request Pre Filters

@@ -18,6 +18,16 @@ lazy val examples =
     )
   )
 
+lazy val auth =
+  (project in file("switch-auth"))
+    .dependsOn(core)
+    .settings(commonSettings: _*)
+    .settings(
+      name := "switch-auth",
+      libraryDependencies ++= Seq(
+      )
+    )
+
 lazy val core =
   (project in file("."))
   .settings(commonSettings: _*)

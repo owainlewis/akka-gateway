@@ -35,15 +35,13 @@ object NoOpPreFilter extends PreFilter {
     Future.successful(Left(HttpResponse(status = StatusCodes.OK)))
 }
 
-object HeaderAuthenticatingPreFilter extends PreFilter {
-  override def apply(request: HttpRequest): Future[Either[HttpResponse, HttpRequest]] = {
-    val notAuthorized = Left(HttpResponse(status = StatusCodes.Unauthorized))
-    Future.successful(notAuthorized)
-  }
-}
-
 class RequestTransformingPreFilter(transformer: RequestTransformer) extends PreFilter {
   def apply(request: HttpRequest): Future[Either[HttpResponse, HttpRequest]] = {
     Future.successful(Right(transformer.transform(request)))
   }
+}
+
+object RequestTransformingPreFilter {
+  def apply(transformer: RequestTransformer) =
+    new RequestTransformingPreFilter(transformer)
 }

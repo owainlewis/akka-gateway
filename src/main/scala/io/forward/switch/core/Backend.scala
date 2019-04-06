@@ -9,13 +9,11 @@ import akka.stream.Materializer
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 
-trait Upstream {
+trait Backend {
   def apply(request: HttpRequest): Future[HttpResponse]
 }
 
-class HttpUpstream[T](target: Uri)(implicit system: ActorSystem, ex: ExecutionContext, materializer: Materializer) extends Upstream {
-  private val defaultTimeout = 20.seconds
-
+class HttpBackend[T](target: Uri, entityTimeout: FiniteDuration = 10.seconds)(implicit system: ActorSystem, ex: ExecutionContext, materializer: Materializer) extends Backend {
   def address(request: HttpRequest): HttpRequest = {
     val initialRequest = request.copy().removeHeader(`Timeout-Access`.name)
     val headers = initialRequest.headers.filterNot(_.name() == `Host`.name) :+ Host(target.authority.host)
@@ -33,21 +31,19 @@ class HttpUpstream[T](target: Uri)(implicit system: ActorSystem, ex: ExecutionCo
     * @param materializer
     * @return
     */
-  def apply(request: HttpRequest): Future[HttpResponse] = {
-    val proxyRequest = address(request)
-    proxyHttpRequest(proxyRequest)
-  }
+  def apply(request: HttpRequest): Future[HttpResponse] =
+    proxyHttpRequest(address(request))
 
   private def proxyHttpRequest(request: HttpRequest): Future[HttpResponse] =
     Http(system).singleRequest(request) flatMap { response =>
-      response.entity.withoutSizeLimit().toStrict(defaultTimeout).flatMap { _ =>
+      response.entity.withoutSizeLimit().toStrict(entityTimeout).flatMap { _ =>
         Future.successful(response)
       }
     }
 }
 
-object HttpUpstream {
+object HttpBackend {
   def apply(target: Uri)
            (implicit system: ActorSystem, ex: ExecutionContext, materializer: Materializer) =
-    new HttpUpstream(target)
+    new HttpBackend(target)
 }
