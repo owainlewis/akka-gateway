@@ -9,6 +9,7 @@ Switch is a library for writing bespoke API Gateways using AKka HTTP. It support
   - Validation
   - Response transformation
   - Load Balancing
+  - Websockets
 
 - Cloud Provider
   - AWS
@@ -20,7 +21,7 @@ Switch is a library for writing bespoke API Gateways using AKka HTTP. It support
 
 Switch is built around some simple concepts.
 
-HTTPRequest -> PreFilter[HttpRequest] -> Dispatch Upstream -> PostFilter -> HttpResponse
+HTTPRequest -> PreFilter[HttpRequest] -> (Return || Dispatch Upstream) -> PostFilter[HttpResponse] -> HttpResponse
 
 ## Getting started
 
