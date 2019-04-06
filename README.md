@@ -27,24 +27,22 @@ HTTPRequest -> PreFilter[HttpRequest] -> (Return || Dispatch Upstream) -> PostFi
 
 ```scala
 object Application extends App {
-  val config = ConfigFactory.load()
-
-  implicit val system: ActorSystem = ActorSystem()
-  implicit val materializer: ActorMaterializer = ActorMaterializer()
-  implicit val executionContext: ExecutionContext = system.dispatcher
-  implicit val http = Http(system)
-
+  import DefaultImplicits._
+  
   object Upstreams {
-    val fooUpstream = new HttpUpstream("https://hookb.in/XkLMbV8x0YubobmZEm1m")
-    val barUpstream = new HttpUpstream("https://jsonplaceholder.typicode.com/todos/1")
+    val fooUpstream = new HttpUpstream("https://postman-echo.com/get")
   }
+
+  val transfomer = new HeaderTransformer(scala.collection.immutable.Seq(RawHeader("X-Foo", "123")))
+  val headerPreFilter = new RequestTransformingPreFilter(transfomer)
 
   val routes: Route =
     path("foo") {
       get {
-          val filterChain = new FilterChain(NoOpPreFilter, NoOpPostFilter)
-          filterChain.apply(Upstreams.fooUpstream)
-        }
+        println("Request")
+        val filterChain = new FilterChain(headerPreFilter, NoOpPostFilter)
+        filterChain.apply(Upstreams.fooUpstream)
+      }
     }
 
   /** Run the server **/
