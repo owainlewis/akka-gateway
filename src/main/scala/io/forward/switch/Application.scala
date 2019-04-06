@@ -9,14 +9,8 @@ import io.forward.switch.filters.{NoOpPostFilter, RequestTransformingPreFilter}
 import io.forward.switch.modules.auth0.JWTPreFilter
 import io.forward.switch.modules.transform.HeaderTransformer
 
-
 object Application extends App {
-
   import DefaultImplicits._
-
-  object Upstreams {
-    val fooUpstream = new HttpUpstream("https://postman-echo.com/get")
-  }
 
   val transfomer = new HeaderTransformer(scala.collection.immutable.Seq(RawHeader("X-Foo", "123")))
   val headerPreFilter = new JWTPreFilter()
@@ -24,8 +18,8 @@ object Application extends App {
   val routes: Route =
     path("foo") {
       get {
-        val filterChain = new FilterChain(headerPreFilter, NoOpPostFilter)
-        filterChain.apply(Upstreams.fooUpstream)
+        FilterChain(headerPreFilter, NoOpPostFilter)
+          .apply(HttpUpstream("https://postman-echo.com/get"))
       }
     }
 

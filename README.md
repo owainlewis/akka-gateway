@@ -29,24 +29,19 @@ HTTPRequest -> PreFilter[HttpRequest] -> (Return || Dispatch Upstream) -> PostFi
 object Application extends App {
   import DefaultImplicits._
 
-  object Upstreams {
-    val fooUpstream = new HttpUpstream("https://postman-echo.com/get")
-  }
-
   val transfomer = new HeaderTransformer(scala.collection.immutable.Seq(RawHeader("X-Foo", "123")))
   val headerPreFilter = new RequestTransformingPreFilter(transfomer)
 
-  val routes: Route =
+  val gateway: Route =
     path("foo") {
       get {
-        println("Request")
-        val filterChain = new FilterChain(headerPreFilter, NoOpPostFilter)
-        filterChain.apply(Upstreams.fooUpstream)
+        FilterChain(headerPreFilter, NoOpPostFilter)
+          .apply(HttpUpstream("https://postman-echo.com/get"))
       }
     }
 
   /** Run the server **/
-  Http().bindAndHandle(routes, interface = "localhost", port = 8080)
+  Http().bindAndHandle(gateway, interface = "localhost", port = 8080)
 }
 
 ```

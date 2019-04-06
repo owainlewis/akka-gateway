@@ -45,3 +45,9 @@ class HttpUpstream[T](target: Uri)(implicit system: ActorSystem, ex: ExecutionCo
       }
     }
 }
+
+object HttpUpstream {
+  def apply(target: Uri)
+           (implicit system: ActorSystem, ex: ExecutionContext, materializer: Materializer) =
+    new HttpUpstream(target)
+}

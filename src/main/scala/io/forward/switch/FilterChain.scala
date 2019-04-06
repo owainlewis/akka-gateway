@@ -36,3 +36,8 @@ final class FilterChain[T](preFilter: PreFilter, postFilter: PostFilter[T]) {
       case Failure(_) => complete("Internal server error")
     }
 }
+
+object FilterChain {
+  def apply[T](preFilter: PreFilter, postFilter: PostFilter[T]) =
+    new FilterChain[T](preFilter, postFilter)
+}
