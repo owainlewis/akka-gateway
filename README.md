@@ -2,7 +2,15 @@
 
 Switch is a library for writing bespoke API Gateways using AKka HTTP. It supports
 
-## Core
+## Running the examples
+
+```
+sbt "project examples" "run
+```
+
+## Features
+
+#### Core
   - Rate limiting
   - Fan out request patterns
   - Validation
@@ -10,10 +18,10 @@ Switch is a library for writing bespoke API Gateways using AKka HTTP. It support
   - Load Balancing
   - Websockets
 
-## Authentication
+#### Authentication
   - Auth0
 
-## Cloud Provider
+#### Cloud Provider
   - AWS
     - Lambda
     - S3
@@ -27,14 +35,16 @@ HTTPRequest -> PreFilter[HttpRequest] -> (Return || Dispatch Upstream) -> PostFi
 
 ## Getting started
 
+The example below shows how to create a custom API Gateway using Switch. We add some pre filters to modify incoming
+requests before sending them upstream.
+
 ```scala
 object SimpleGateway extends App with DefaultImplicits {
 
   object FooBackend {
     private val firstPreFilter = RequestTransformingPreFilter(HeaderTransformer(add = Seq(RawHeader("X-Foo", "123"))))
-    private val secondPreFilter = RequestTransformingPreFilter(HeaderTransformer(add = Seq(RawHeader("X-Bar", "456"))))
+    private val secondPreFilter = RateLimitingPreFilter(10)
 
-    // Run each transform step in order before dispatching to backend
     private val headerPreFilter = firstPreFilter ~> secondPreFilter
 
     val route: Route = FilterChain(headerPreFilter, NoOpPostFilter)
