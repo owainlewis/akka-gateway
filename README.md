@@ -1,6 +1,6 @@
 # Switch
 
-Switch is a library for writing bespoke API Gateways using AKka HTTP. It supports
+Switch is a library for writing bespoke API Gateways using Akka HTTP. 
 
 ## Running the examples
 
