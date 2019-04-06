@@ -28,7 +28,7 @@ HTTPRequest -> PreFilter[HttpRequest] -> (Return || Dispatch Upstream) -> PostFi
 ```scala
 object Application extends App {
   import DefaultImplicits._
-  
+
   object Upstreams {
     val fooUpstream = new HttpUpstream("https://postman-echo.com/get")
   }

@@ -1,12 +1,14 @@
 package io.forward.switch
 
 import akka.http.scaladsl.Http
-import akka.http.scaladsl.model.headers.RawHeader
-import akka.http.scaladsl.server.Directives.{get, path}
-import akka.http.scaladsl.server.Route
+import akka.http.scaladsl.model.headers.{Authorization, OAuth2BearerToken, RawHeader}
+import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.{AuthorizationFailedRejection, Route}
 import io.forward.switch.core.HttpUpstream
 import io.forward.switch.filters.{NoOpPostFilter, RequestTransformingPreFilter}
+import io.forward.switch.modules.auth0.JWTPreFilter
 import io.forward.switch.modules.transform.HeaderTransformer
+
 
 object Application extends App {
 
@@ -17,12 +19,11 @@ object Application extends App {
   }
 
   val transfomer = new HeaderTransformer(scala.collection.immutable.Seq(RawHeader("X-Foo", "123")))
-  val headerPreFilter = new RequestTransformingPreFilter(transfomer)
+  val headerPreFilter = new JWTPreFilter()
 
   val routes: Route =
     path("foo") {
       get {
-        println("Request")
         val filterChain = new FilterChain(headerPreFilter, NoOpPostFilter)
         filterChain.apply(Upstreams.fooUpstream)
       }

@@ -8,6 +8,7 @@ sealed trait RequestTransformer {
 }
 
 final class HeaderTransformer(add: ISeq[HttpHeader], delete: Seq[String] = Seq.empty) extends RequestTransformer {
+
   def addHeaders(request: HttpRequest): HttpRequest = request.withHeaders(add)
 
   def deleteHeaders(request: HttpRequest): HttpRequest = request
@@ -16,4 +17,9 @@ final class HeaderTransformer(add: ISeq[HttpHeader], delete: Seq[String] = Seq.e
     val transformer = deleteHeaders _ andThen addHeaders
     transformer(httpRequest)
   }
+}
+
+object HeaderTransformer {
+  def apply(add: ISeq[HttpHeader], delete: Seq[String] = Seq.empty): HeaderTransformer =
+    new HeaderTransformer(add, delete)
 }
