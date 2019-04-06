@@ -35,7 +35,7 @@ object NoOpPreFilter extends PreFilter {
     Future.successful(Left(HttpResponse(status = StatusCodes.OK)))
 }
 
-class RequestTransformingPreFilter(transformer: RequestTransformer) extends PreFilter {
+class RequestTransformingPreFilter(transformer: RequestTransformer) extends ComposablePreFilter {
   def apply(request: HttpRequest): Future[Either[HttpResponse, HttpRequest]] = {
     Future.successful(Right(transformer.transform(request)))
   }

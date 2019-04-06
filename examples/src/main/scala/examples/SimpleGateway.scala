@@ -15,8 +15,10 @@ import scala.concurrent.ExecutionContext
 object SimpleGateway extends App with DefaultImplicits {
 
   object FooBackend {
-    private val headerTransform = HeaderTransformer(add = Seq(RawHeader("X-Foo", "123")), remove = Seq("X-Bar"))
-    private val headerPreFilter = RequestTransformingPreFilter(headerTransform)
+    private val firstPreFilter = RequestTransformingPreFilter(HeaderTransformer(add = Seq(RawHeader("X-Foo", "123"))))
+    private val secondPreFilter = RequestTransformingPreFilter(HeaderTransformer(add = Seq(RawHeader("X-Bar", "456"))))
+
+    private val headerPreFilter = firstPreFilter ~> secondPreFilter
 
     val route: Route = FilterChain(headerPreFilter, NoOpPostFilter)
       .apply(HttpBackend("https://postman-echo.com/get"))
