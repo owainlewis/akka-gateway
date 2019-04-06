@@ -31,8 +31,11 @@ HTTPRequest -> PreFilter[HttpRequest] -> (Return || Dispatch Upstream) -> PostFi
 object SimpleGateway extends App with DefaultImplicits {
 
   object FooBackend {
-    private val headerTransform = HeaderTransformer(add = Seq(RawHeader("X-Foo", "123")), remove = Seq("X-Bar"))
-    private val headerPreFilter = RequestTransformingPreFilter(headerTransform)
+    private val firstPreFilter = RequestTransformingPreFilter(HeaderTransformer(add = Seq(RawHeader("X-Foo", "123"))))
+    private val secondPreFilter = RequestTransformingPreFilter(HeaderTransformer(add = Seq(RawHeader("X-Bar", "456"))))
+
+    // Run each transform step in order before dispatching to backend
+    private val headerPreFilter = firstPreFilter ~> secondPreFilter
 
     val route: Route = FilterChain(headerPreFilter, NoOpPostFilter)
       .apply(HttpBackend("https://postman-echo.com/get"))
@@ -54,4 +57,21 @@ object SimpleGateway extends App with DefaultImplicits {
 A pre filter can be used to modify an incoming HTTP request before it is sent upstream. It can also perform logic such as
 authentication.
 
+```scala
+trait PreFilter {
+  def apply(request: HttpRequest): Future[Either[HttpResponse, HttpRequest]]
+```
+
 ### Response Post Filters
+
+A post filter is used to modify the HTTP response received from a Backend. For example you might want to modify headers or response messages.
+
+```scala
+trait PostFilter[-RequestData] {
+  def apply(request: HttpRequest, response: HttpResponse, data: RequestData): Future[HttpResponse]
+}
+```
+
+### Writing custom filters
+
+TODO

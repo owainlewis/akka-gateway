@@ -1,7 +1,6 @@
 package io.forward.switch.filters
 
 import akka.http.scaladsl.model.{HttpRequest, HttpResponse, StatusCodes}
-import io.forward.switch.modules.transform.RequestTransformer
 
 import scala.concurrent.Future
 
@@ -33,15 +32,4 @@ trait PreFilter {
 object NoOpPreFilter extends PreFilter {
   def apply(request: HttpRequest): Future[Either[HttpResponse, HttpRequest]] =
     Future.successful(Left(HttpResponse(status = StatusCodes.OK)))
-}
-
-class RequestTransformingPreFilter(transformer: RequestTransformer) extends ComposablePreFilter {
-  def apply(request: HttpRequest): Future[Either[HttpResponse, HttpRequest]] = {
-    Future.successful(Right(transformer.transform(request)))
-  }
-}
-
-object RequestTransformingPreFilter {
-  def apply(transformer: RequestTransformer) =
-    new RequestTransformingPreFilter(transformer)
 }

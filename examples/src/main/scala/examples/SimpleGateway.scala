@@ -7,7 +7,8 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
 import io.forward.switch.core.HttpBackend
-import io.forward.switch.filters.{FilterChain, NoOpPostFilter, RequestTransformingPreFilter}
+import io.forward.switch.filters.pre.transform.RequestTransformingPreFilter
+import io.forward.switch.filters.{FilterChain, NoOpPostFilter}
 import io.forward.switch.modules.transform.HeaderTransformer
 
 import scala.concurrent.ExecutionContext
