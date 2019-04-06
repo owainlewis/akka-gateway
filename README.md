@@ -1,12 +1,28 @@
 # Switch
 
-Switch is a library for writing customizable API Gateways using AKka HTTP.
+Switch is a library for writing bespoke API Gateways using AKka HTTP. It supports
+
+- Core
+  - Rate limiting
+  - Authentication
+  - Fan out request patterns
+  - Validation
+  - Response transformation
+  - Load Balancing
+
+- Cloud Provider
+  - AWS
+    - Lambda
+    - S3
+  - Google Functions
+
+## Concepts
+
+Switch is built around some simple concepts.
+
+HTTPRequest -> PreFilter[HttpRequest] -> Dispatch Upstream -> PostFilter -> HttpResponse
 
 ## Getting started
-
-### Request Filters
-
-### Response Filters
 
 ```scala
 object Application extends App {
@@ -35,3 +51,10 @@ object Application extends App {
 }
 
 ```
+
+### Request Pre Filters
+
+A pre filter can be used to modify an incoming HTTP request before it is sent upstream. It can also perform logic such as
+authentication.
+
+### Response Post Filters

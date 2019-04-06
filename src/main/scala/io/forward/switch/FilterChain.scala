@@ -1,48 +1,12 @@
 package io.forward.switch
 
-import akka.http.scaladsl.model.{HttpRequest, HttpResponse, StatusCodes}
+import akka.http.scaladsl.model.HttpRequest
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import io.forward.switch.core.Upstream
+import io.forward.switch.filters.{PostFilter, PreFilter}
 
 import scala.util.{Failure, Success}
-import scala.concurrent.Future
-
-trait PreFilter {
-  def apply(request: HttpRequest): Future[Either[HttpResponse, HttpRequest]]
-  /**
-    * Halt a request chain by immediately existing and returning a response
-    *
-    * @param response The [[akka.http.scaladsl.model.HttpResponse]] to return
-    *
-    * @return
-    */
-  def exit(response: HttpResponse): Future[Either[HttpResponse, HttpRequest]] = Future.successful(Left(response))
-}
-
-object NoOpPreFilter extends PreFilter {
-  def apply(request: HttpRequest): Future[Either[HttpResponse, HttpRequest]] =
-    Future.successful(Left(HttpResponse(status = StatusCodes.OK)))
-}
-
-object HeaderAuthenticatingPreFilter extends PreFilter {
-  override def apply(request: HttpRequest): Future[Either[HttpResponse, HttpRequest]] = {
-    val notAuthorized = Left(HttpResponse(status = StatusCodes.Unauthorized))
-    Future.successful(notAuthorized)
-  }
-}
-
-////////////////////////////////////////////////
-
-trait PostFilter[-RequestData] {
-  def apply(request: HttpRequest, response: HttpResponse, data: RequestData): Future[HttpResponse]
-}
-
-object NoOpPostFilter extends PostFilter[Unit] {
-  override def apply(request: HttpRequest, response: HttpResponse, data: Unit): Future[HttpResponse] =
-    Future.successful(HttpResponse(status = StatusCodes.BadGateway))
-}
-
 
 /**
   * A filter chain encapsulates the logic for running pre and post filters before and after executing an
