@@ -13,7 +13,8 @@ trait Backend {
   def apply(request: HttpRequest): Future[HttpResponse]
 }
 
-class HttpBackend[T](target: Uri, entityTimeout: FiniteDuration = 10.seconds)(implicit system: ActorSystem, ex: ExecutionContext, materializer: Materializer) extends Backend {
+final class HttpBackend[T](target: Uri, entityTimeout: FiniteDuration = 10.seconds)
+                    (implicit system: ActorSystem, ex: ExecutionContext, materializer: Materializer) extends Backend {
   def address(request: HttpRequest): HttpRequest = {
     val initialRequest = request.copy().removeHeader(`Timeout-Access`.name)
     val headers = initialRequest.headers.filterNot(_.name() == `Host`.name) :+ Host(target.authority.host)
