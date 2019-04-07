@@ -41,24 +41,14 @@ requests before sending them upstream.
 ```scala
 object SimpleGateway extends App with DefaultImplicits {
 
-  object FooBackend {
-    private val firstPreFilter = RequestTransformingPreFilter(HeaderTransformer(add = Seq(RawHeader("X-Foo", "123"))))
-    private val secondPreFilter = RateLimitingPreFilter(10)
-
-    private val headerPreFilter = firstPreFilter ~> secondPreFilter
-
-    val route: Route = FilterChain(headerPreFilter, NoOpPostFilter)
-      .apply(HttpBackend("https://postman-echo.com/get"))
-  }
-
-  val routes: Route =
+  val gateway: Route =
     path("foo") {
       get {
-        FooBackend.route
+        FilterChain(BasicAuthPreFilter("password"), HttpBackend("https://postman-echo.com/get"), NoOpPostFilter)
       }
     }
 
-  Http().bindAndHandle(routes, interface = "localhost", port = 8080)
+  Http().bindAndHandle(gateway, interface = "localhost", port = 8080)
 }
 ```
 
