@@ -14,8 +14,6 @@ import scala.concurrent.duration._
   * A filter chain encapsulates the logic for running pre and post filters before and after executing an
   * [[Backend]]
   *
-  * TODO make this a sequence of filters
-  *
   * @param pre A [[PreFilter]] to modify an incoming [[HttpRequest]]
   * @param backend A [[io.forward.switch.core.backend.HttpBackend]] to proxy
   * @param post A [[PostFilter]] to post process a [[HttpResponse]]
