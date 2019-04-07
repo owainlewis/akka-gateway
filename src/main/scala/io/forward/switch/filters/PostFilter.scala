@@ -1,6 +1,6 @@
 package io.forward.switch.filters
 
-import akka.http.scaladsl.model.{HttpEntity, HttpResponse, StatusCodes}
+import akka.http.scaladsl.model.HttpResponse
 
 import scala.concurrent.Future
 
@@ -10,5 +10,5 @@ trait PostFilter {
 
 object NoOpPostFilter extends PostFilter {
   override def apply(response: HttpResponse, body: String): Future[HttpResponse] =
-    Future.successful(HttpResponse(status = StatusCodes.OK, entity = HttpEntity.apply("FOO")))
+    Future.successful(response)
 }

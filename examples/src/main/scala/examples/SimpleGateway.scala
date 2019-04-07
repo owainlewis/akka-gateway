@@ -5,8 +5,9 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.{Http, HttpExt}
 import akka.stream.ActorMaterializer
-import io.forward.switch.core.HttpBackend
-import io.forward.switch.filters.{FilterChain, NoOpPostFilter, NoOpPreFilter}
+import io.forward.switch.core.backend.HttpBackend
+import io.forward.switch.filters._
+import io.forward.switch.filters.pre.auth.BasicAuthPreFilter
 
 import scala.concurrent.ExecutionContext
 
@@ -15,7 +16,7 @@ object SimpleGateway extends App with DefaultImplicits {
   val routes: Route =
     path("foo") {
       get {
-        FilterChain(NoOpPreFilter, HttpBackend("https://postman-echo.com/get"), NoOpPostFilter)
+        FilterChain(BasicAuthPreFilter("password"), HttpBackend("https://postman-echo.com/get"), NoOpPostFilter)
       }
     }
 

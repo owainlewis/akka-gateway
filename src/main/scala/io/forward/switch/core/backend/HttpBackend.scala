@@ -1,4 +1,4 @@
-package io.forward.switch.core
+package io.forward.switch.core.backend
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
@@ -9,12 +9,17 @@ import akka.stream.Materializer
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 
-trait Backend {
-  def apply(request: HttpRequest): Future[HttpResponse]
-}
-
-final class HttpBackend[T](target: Uri, entityTimeout: FiniteDuration = 10.seconds)
-                    (implicit system: ActorSystem, ex: ExecutionContext, materializer: Materializer) extends Backend {
+final class HttpBackend(target: Uri, entityTimeout: FiniteDuration = 10.seconds)
+                          (implicit
+                           system: ActorSystem,
+                           ex: ExecutionContext,
+                           materializer: Materializer) extends Backend {
+  /**
+    * Prior to dispatching a request, strip headers and make initial modifications
+    *
+    * @param request An [[HttpRequest]] to address
+    * @return A [[HttpRequest]] to dispatch
+    */
   def address(request: HttpRequest): HttpRequest = {
     val initialRequest = request.copy().removeHeader(`Timeout-Access`.name)
     val headers = initialRequest.headers.filterNot(_.name() == `Host`.name) :+ Host(target.authority.host)
@@ -33,14 +38,7 @@ final class HttpBackend[T](target: Uri, entityTimeout: FiniteDuration = 10.secon
     * @return
     */
   def apply(request: HttpRequest): Future[HttpResponse] =
-    proxyHttpRequest(address(request))
-
-  private def proxyHttpRequest(request: HttpRequest): Future[HttpResponse] =
-    Http(system).singleRequest(request) flatMap { response =>
-      response.entity.withoutSizeLimit().toStrict(entityTimeout).flatMap { _ =>
-        Future.successful(response)
-      }
-    }
+    Http(system).singleRequest(address(request))
 }
 
 object HttpBackend {
@@ -48,3 +46,4 @@ object HttpBackend {
            (implicit system: ActorSystem, ex: ExecutionContext, materializer: Materializer) =
     new HttpBackend(target)
 }
+

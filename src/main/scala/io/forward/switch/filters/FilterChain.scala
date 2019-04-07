@@ -4,7 +4,7 @@ import akka.http.scaladsl.model.{HttpRequest, HttpResponse}
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.stream.Materializer
-import io.forward.switch.core.Backend
+import io.forward.switch.core.backend.Backend
 import akka.http.scaladsl.unmarshalling.Unmarshal
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -17,7 +17,7 @@ import scala.concurrent.duration._
   * TODO make this a sequence of filters
   *
   * @param pre A [[PreFilter]] to modify an incoming [[HttpRequest]]
-  * @param backend A [[io.forward.switch.core.HttpBackend]] to proxy
+  * @param backend A [[io.forward.switch.core.backend.HttpBackend]] to proxy
   * @param post A [[PostFilter]] to post process a [[HttpResponse]]
   * @tparam T
   */
@@ -36,7 +36,7 @@ final class FilterChain(pre: PreFilter, backend: Backend, post: PostFilter)(impl
       onSuccess(postFilteredResponse) (complete(_))
     }
 
-  private def unmarshallResponseEntity(response: HttpResponse): Future[String] =
+  private def unmarshallResponseEntity[T](response: HttpResponse): Future[String] =
     response.entity.withoutSizeLimit().toStrict(5.seconds).flatMap(Unmarshal(_).to[String])
 }
 
