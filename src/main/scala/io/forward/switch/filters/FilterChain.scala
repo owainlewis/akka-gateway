@@ -1,12 +1,13 @@
 package io.forward.switch.filters
 
-import akka.http.scaladsl.model.HttpRequest
+import akka.http.scaladsl.model.{HttpRequest, HttpResponse}
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.stream.Materializer
 import io.forward.switch.core.Backend
 import akka.http.scaladsl.unmarshalling.Unmarshal
-import scala.concurrent.ExecutionContext
+
+import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration._
 
 /**
@@ -28,18 +29,17 @@ final class FilterChain(pre: PreFilter, backend: Backend, post: PostFilter)(impl
       }
     }
 
-  private def dispatch(upstream: Backend, post: PostFilter, request: HttpRequest) =
+  private def dispatch(upstream: Backend, post: PostFilter, request: HttpRequest): Route =
     onSuccess(upstream.apply(request)) { response =>
-      // TODO tidy this up ! : )
-      val fb = response.entity.withoutSizeLimit().toStrict(5.seconds).flatMap(Unmarshal(_).to[String])
-      val x = fb flatMap (body => post.apply(response, body))
-      onSuccess(x) { result =>
-        complete(result)
-      }
+      val postFilteredResponse = unmarshallResponseEntity(response) flatMap (post.apply(response, _))
+      onSuccess(postFilteredResponse) (complete(_))
     }
+
+  private def unmarshallResponseEntity(response: HttpResponse): Future[String] =
+    response.entity.withoutSizeLimit().toStrict(5.seconds).flatMap(Unmarshal(_).to[String])
 }
 
 object FilterChain {
-  def apply(pre: PreFilter, backend: Backend, post: PostFilter)(implicit ex: ExecutionContext, mat: Materializer) =
-    new FilterChain(pre, backend, post)
+  def apply(pre: PreFilter, backend: Backend, post: PostFilter)(implicit ex: ExecutionContext, mat: Materializer): Route =
+    new FilterChain(pre, backend, post).apply()
 }
