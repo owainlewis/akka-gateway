@@ -12,8 +12,8 @@ final class BasicAuthPreFilter(realm: String, password: String) extends Composab
 
   override def apply(request: HttpRequest): Future[Either[HttpResponse, HttpRequest]] =
     request.getHeader(Authorization.lowercaseName).asScala match {
-      case Some(_) => Future.successful(Right(request))
-      case None =>  unauthorized
+      case Some(_) => continue(request)
+      case None => abort(HttpResponse(status = StatusCodes.Unauthorized))
     }
 
   private def myUserPassAuthenticator(credentials: Credentials): Option[String] =
@@ -21,8 +21,6 @@ final class BasicAuthPreFilter(realm: String, password: String) extends Composab
       case p @ Credentials.Provided(id) if p.verify(password) => Some(id)
       case _ => None
     }
-
-  private val unauthorized = Future.successful(Left(HttpResponse(status = StatusCodes.Unauthorized)))
 }
 
 object BasicAuthPreFilter {

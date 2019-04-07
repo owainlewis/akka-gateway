@@ -1,6 +1,6 @@
 package io.forward.switch.filters
 
-import akka.http.scaladsl.model.{HttpRequest, HttpResponse, StatusCodes}
+import akka.http.scaladsl.model.{HttpRequest, HttpResponse}
 
 import scala.concurrent.Future
 
@@ -13,7 +13,8 @@ trait PreFilter {
     * processing.
     *
     * @param request An incoming [[HttpRequest]] destined for an upstream
-    * @return Either a HttpResponse or a HttpRequest
+    *
+    * @return Either a [[HttpResponse]] or a [[HttpRequest]]
     */
   def apply(request: HttpRequest): Future[Either[HttpResponse, HttpRequest]]
   /**
@@ -24,12 +25,20 @@ trait PreFilter {
     *
     * @param response The [[akka.http.scaladsl.model.HttpResponse]] to return
     *
-    * @return
+    * @return Either a [[HttpResponse]] or a [[HttpRequest]]
     */
   def abort(response: HttpResponse): Future[Either[HttpResponse, HttpRequest]] = Future.successful(Left(response))
+  /**
+    * Calling continue will proceed to the next step of the filter chain
+    *
+    * @param request An [[HttpRequest]]
+    *
+    * @return Either a [[HttpResponse]] or a [[HttpRequest]]
+    */
+  def continue(request: HttpRequest): Future[Either[HttpResponse, HttpRequest]] = Future.successful(Right(request))
 }
 
 object NoOpPreFilter extends PreFilter {
   def apply(request: HttpRequest): Future[Either[HttpResponse, HttpRequest]] =
-    Future.successful(Right(request))
+    continue(request)
 }

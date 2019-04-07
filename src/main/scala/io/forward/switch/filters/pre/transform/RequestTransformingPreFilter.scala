@@ -2,7 +2,6 @@ package io.forward.switch.filters.pre.transform
 
 import akka.http.scaladsl.model.{HttpRequest, HttpResponse}
 import io.forward.switch.filters.ComposablePreFilter
-import io.forward.switch.modules.transform.RequestTransformer
 
 import scala.concurrent.Future
 
@@ -14,9 +13,8 @@ import scala.concurrent.Future
   * @param transformer A [[RequestTransformer]]
   */
 class RequestTransformingPreFilter(transformer: RequestTransformer) extends ComposablePreFilter {
-  def apply(request: HttpRequest): Future[Either[HttpResponse, HttpRequest]] = {
-    Future.successful(Right(transformer.transform(request)))
-  }
+  def apply(request: HttpRequest): Future[Either[HttpResponse, HttpRequest]] =
+    continue(transformer.transform(request))
 }
 
 object RequestTransformingPreFilter {

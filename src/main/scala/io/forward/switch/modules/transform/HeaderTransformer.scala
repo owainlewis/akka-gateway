@@ -1,6 +1,7 @@
 package io.forward.switch.modules.transform
 
 import akka.http.scaladsl.model.{HttpHeader, HttpRequest}
+import io.forward.switch.filters.pre.transform.RequestTransformer
 
 /**
   * A header transformer can be used to modify HTTP headers on a request.
@@ -17,10 +18,10 @@ final class HeaderTransformer(add: Seq[HttpHeader], remove: Seq[String] = Seq.em
     * @param httpRequest A [[HttpRequest]] to modify
     * @return A [[HttpRequest]]
     */
-  def transform(httpRequest: HttpRequest): HttpRequest = {
-    val transformer = deleteHeaders _ andThen addHeaders
-    transformer(httpRequest)
-  }
+  def transform(request: HttpRequest): HttpRequest =
+    deleteThenAdd(request)
+
+  private val deleteThenAdd = deleteHeaders _ andThen addHeaders
 
   private def addHeaders(request: HttpRequest) =
     add.foldLeft(request)((x, y) => x.addHeader(y))
