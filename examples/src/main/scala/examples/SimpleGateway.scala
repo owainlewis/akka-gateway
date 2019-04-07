@@ -9,27 +9,17 @@ import akka.stream.ActorMaterializer
 import io.forward.switch.core.HttpBackend
 import io.forward.switch.filters.pre.ratelimit.RateLimitingPreFilter
 import io.forward.switch.filters.pre.transform.RequestTransformingPreFilter
-import io.forward.switch.filters.{FilterChain, NoOpPostFilter}
+import io.forward.switch.filters.{FilterChain, NoOpPostFilter, NoOpPreFilter}
 import io.forward.switch.modules.transform.HeaderTransformer
 
 import scala.concurrent.ExecutionContext
 
 object SimpleGateway extends App with DefaultImplicits {
 
-  object FooBackend {
-    private val firstPreFilter = RequestTransformingPreFilter(HeaderTransformer(add = Seq(RawHeader("X-Foo", "123"))))
-    private val secondPreFilter = RateLimitingPreFilter(10)
-
-    private val headerPreFilter = firstPreFilter ~> secondPreFilter
-
-    val route: Route = FilterChain(headerPreFilter, NoOpPostFilter)
-      .apply(HttpBackend("https://postman-echo.com/get"))
-  }
-
   val routes: Route =
     path("foo") {
       get {
-        FooBackend.route
+        FilterChain(NoOpPreFilter, HttpBackend("https://postman-echo.com/get"), NoOpPostFilter).apply()
       }
     }
 

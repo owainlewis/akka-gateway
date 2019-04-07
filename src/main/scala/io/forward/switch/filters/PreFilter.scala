@@ -31,5 +31,5 @@ trait PreFilter {
 
 object NoOpPreFilter extends PreFilter {
   def apply(request: HttpRequest): Future[Either[HttpResponse, HttpRequest]] =
-    abort(HttpResponse(status = StatusCodes.OK))
+    Future.successful(Right(request))
 }
