@@ -16,12 +16,13 @@ import scala.concurrent.duration._
   *
   * TODO make this a sequence of filters
   *
-  * @param preFilter
-  * @param postFilter
+  * @param pre A [[PreFilter]] to modify an incoming [[HttpRequest]]
+  * @param backend A [[io.forward.switch.core.HttpBackend]] to proxy
+  * @param post A [[PostFilter]] to post process a [[HttpResponse]]
   * @tparam T
   */
 final class FilterChain(pre: PreFilter, backend: Backend, post: PostFilter)(implicit ex: ExecutionContext, mat: Materializer){
-  def apply(): Route =
+  def asRoute(): Route =
     extractRequest { request: HttpRequest =>
       onSuccess(pre.apply(request)) {
         case Left(response) => complete(response)
@@ -41,5 +42,5 @@ final class FilterChain(pre: PreFilter, backend: Backend, post: PostFilter)(impl
 
 object FilterChain {
   def apply(pre: PreFilter, backend: Backend, post: PostFilter)(implicit ex: ExecutionContext, mat: Materializer): Route =
-    new FilterChain(pre, backend, post).apply()
+    new FilterChain(pre, backend, post).asRoute()
 }
