@@ -1,8 +1,8 @@
-package io.forward.switch.filters.pre.auth
+package io.forward.gateway.filters.pre.auth
 
 import akka.http.scaladsl.model.{HttpRequest, HttpResponse, StatusCodes}
 import akka.http.scaladsl.server.directives.Credentials
-import io.forward.switch.filters.ComposablePreFilter
+import io.forward.gateway.filters.ComposablePreFilter
 import akka.http.scaladsl.model.headers.Authorization
 
 import scala.compat.java8.OptionConverters._

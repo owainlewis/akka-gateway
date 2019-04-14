@@ -1,4 +1,4 @@
-package io.forward.switch.core.backend
+package io.forward.gateway.core.backend
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
@@ -9,7 +9,7 @@ import akka.stream.Materializer
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 
-final class HttpBackend(target: Uri, entityTimeout: FiniteDuration = 10.seconds)
+class HttpBackend(target: Uri, entityTimeout: FiniteDuration = 10.seconds)
                           (implicit
                            system: ActorSystem,
                            ex: ExecutionContext,

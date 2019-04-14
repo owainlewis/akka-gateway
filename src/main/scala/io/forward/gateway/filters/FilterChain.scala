@@ -1,10 +1,10 @@
-package io.forward.switch.filters
+package io.forward.gateway.filters
 
 import akka.http.scaladsl.model.{HttpRequest, HttpResponse}
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.stream.Materializer
-import io.forward.switch.core.backend.Backend
+import io.forward.gateway.core.backend.Backend
 import akka.http.scaladsl.unmarshalling.Unmarshal
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -14,9 +14,9 @@ import scala.concurrent.duration._
   * A filter chain encapsulates the logic for running pre and post filters before and after executing an
   * [[Backend]]
   *
-  * @param pre A [[PreFilter]] to modify an incoming [[HttpRequest]]
-  * @param backend A [[io.forward.switch.core.backend.HttpBackend]] to proxy
-  * @param post A [[PostFilter]] to post process a [[HttpResponse]]
+  * @param pre     A [[PreFilter]] to modify an incoming [[HttpRequest]]
+  * @param backend A [[io.forward.gateway.core.backend.HttpBackend]] to proxy
+  * @param post    A [[PostFilter]] to post process a [[HttpResponse]]
   * @tparam T
   */
 final class FilterChain(pre: PreFilter, backend: Backend, post: PostFilter)(implicit ex: ExecutionContext, mat: Materializer){

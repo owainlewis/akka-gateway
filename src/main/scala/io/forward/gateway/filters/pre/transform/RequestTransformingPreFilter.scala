@@ -1,7 +1,7 @@
-package io.forward.switch.filters.pre.transform
+package io.forward.gateway.filters.pre.transform
 
 import akka.http.scaladsl.model.{HttpRequest, HttpResponse}
-import io.forward.switch.filters.ComposablePreFilter
+import io.forward.gateway.filters.ComposablePreFilter
 
 import scala.concurrent.Future
 

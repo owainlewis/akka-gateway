@@ -1,4 +1,4 @@
-package io.forward.switch.proxy
+package io.forward.gateway.proxy
 
 import akka.http.scaladsl.model.{HttpResponse, StatusCodes}
 import akka.http.scaladsl.server.Directives.complete

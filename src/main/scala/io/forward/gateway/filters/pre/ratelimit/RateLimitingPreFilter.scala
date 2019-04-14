@@ -1,7 +1,7 @@
-package io.forward.switch.filters.pre.ratelimit
+package io.forward.gateway.filters.pre.ratelimit
 
 import akka.http.scaladsl.model.{HttpRequest, HttpResponse, StatusCodes}
-import io.forward.switch.filters.ComposablePreFilter
+import io.forward.gateway.filters.ComposablePreFilter
 
 import scala.concurrent.Future
 

@@ -1,7 +1,7 @@
-package io.forward.switch.modules.transform
+package io.forward.gateway.modules.transform
 
 import akka.http.scaladsl.model.{HttpHeader, HttpRequest}
-import io.forward.switch.filters.pre.transform.RequestTransformer
+import io.forward.gateway.filters.pre.transform.RequestTransformer
 
 /**
   * A header transformer can be used to modify HTTP headers on a request.

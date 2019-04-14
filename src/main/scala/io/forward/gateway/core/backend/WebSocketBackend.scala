@@ -1,4 +1,4 @@
-package io.forward.switch.core.backend
+package io.forward.gateway.core.backend
 import akka.http.scaladsl.model.{HttpRequest, HttpResponse}
 
 import scala.concurrent.Future
