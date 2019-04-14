@@ -13,17 +13,17 @@ lazy val examples =
     .dependsOn(core)
     .settings(commonSettings: _*)
     .settings(
-      name := "switch-example",
+      name := "gateway-example",
       libraryDependencies ++= Seq(
     )
   )
 
 lazy val auth =
-  (project in file("switch-auth"))
+  (project in file("gateway-auth"))
     .dependsOn(core)
     .settings(commonSettings: _*)
     .settings(
-      name := "switch-auth",
+      name := "gateway-auth",
       libraryDependencies ++= Seq(
       )
     )
@@ -32,7 +32,7 @@ lazy val core =
   (project in file("."))
   .settings(commonSettings: _*)
   .settings(
-    name := "switch-core",
+    name := "gateway-core",
     publishMavenStyle := true,
     libraryDependencies ++= Seq(
       "com.typesafe.akka" %% "akka-http"    % akkaHttpVersion,

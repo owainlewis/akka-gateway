@@ -1,6 +1,6 @@
-# Switch
+# Gateway
 
-Switch is a library for writing bespoke API Gateways using Akka HTTP. 
+Gateway is a library for writing bespoke API Gateways using Akka HTTP.
 
 ## Running the examples
 
@@ -29,7 +29,7 @@ sbt "project examples" "run
 
 ## Concepts
 
-Switch is built around some simple concepts.
+Gateway is built around some simple concepts.
 
 HTTPRequest -> PreFilter[HttpRequest] -> (Return || Dispatch Upstream) -> PostFilter[HttpResponse] -> HttpResponse
 
