@@ -1,6 +1,7 @@
 lazy val akkaHttpVersion = "10.1.8"
-
 lazy val akkaVersion = "2.5.21"
+lazy val circeVersion = "0.11.1"
+lazy val catsVersion = "0.6.0"
 
 lazy val commonSettings = Seq(
   organization := "io.forward",
@@ -35,11 +36,12 @@ lazy val core =
     name := "gateway-core",
     publishMavenStyle := true,
     libraryDependencies ++= Seq(
-      "com.typesafe.akka" %% "akka-http"    % akkaHttpVersion,
-      "com.typesafe.akka" %% "akka-actor"   % akkaVersion,
-      "com.typesafe.akka" %% "akka-stream"  % akkaVersion,
-      "org.typelevel"     %% "cats-core"    % "1.6.0",
-      "io.circe"          %% "circe-core"   % "0.11.1"
+      "com.typesafe.akka" %% "akka-http"       % akkaHttpVersion,
+      "com.typesafe.akka" %% "akka-actor"      % akkaVersion,
+      "com.typesafe.akka" %% "akka-stream"     % akkaVersion,
+      "org.typelevel"     %% "cats-core"       % catsVersion,
+      "io.circe"          %% "circe-core"      % circeVersion,
+      "io.circe"          %% "circe-generic"   % circeVersion
     )
   )
 
