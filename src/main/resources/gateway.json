@@ -1,0 +1,10 @@
+{
+  "routes": [{
+    "method": "GET",
+    "path": "/users",
+    "backend": {
+      "kind": "http",
+      "url": "http://localhost:9090/users"
+    }
+  }]
+}

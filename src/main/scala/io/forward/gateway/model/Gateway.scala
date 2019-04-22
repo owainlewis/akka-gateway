@@ -10,7 +10,7 @@ import io.circe.generic.semiauto._
 /**
   * An API Gateway is a type that contains routes mapping to various backends.
   *
-  * @param routes
+  * @param routes A sequence of routes
   */
 case class Gateway(routes: Seq[Route])
 
