@@ -28,16 +28,6 @@ lazy val examples =
     )
   )
 
-lazy val auth =
-  (project in file("gateway-auth"))
-    .dependsOn(core)
-    .settings(commonSettings: _*)
-    .settings(
-      name := "gateway-auth",
-      libraryDependencies ++= Seq(
-      )
-    )
-
 lazy val core =
   (project in file("."))
   .settings(commonSettings: _*)
