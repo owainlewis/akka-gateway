@@ -1,39 +1,35 @@
 package examples
 
 import akka.actor.ActorSystem
+import io.forward.gateway.Gateway
 import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.server.{Directive0, Route}
-import akka.http.scaladsl.{Http, HttpExt}
 import akka.stream.ActorMaterializer
-import io.forward.gateway.core.backend._
-import io.forward.gateway.filters._
-import io.forward.gateway.filters.pre.auth.BasicAuthPreFilter
-import io.forward.gateway.model.{Get, HttpRequestMethod}
-import io.forward.gateway.modules.loadbalance.RoundRobin
+import io.forward.gateway.proxy.Client
+import akka.http.scaladsl.model.StatusCodes._
+import io.forward.gateway.filters.NoOpPreFilter
 
 import scala.concurrent.ExecutionContext
 
-object SimpleGateway extends App with DefaultImplicits {
+object SimpleGateway extends App {
+  implicit val system: ActorSystem = ActorSystem()
+  implicit val mat: ActorMaterializer = ActorMaterializer()
+  implicit val executionContext: ExecutionContext = system.dispatcher
 
-  val balancer = new RoundRobin(Seq("https://google.com", "https://owainlewis.com", "https://postman-echo.com/get"))
+  import io.forward.gateway.filters.FilterDirectives._
 
-  // Random ideas
+  val client = new Client("http://dummy.restapiexample.com/api/v1/employees")
 
-  def route(pathMatch: String, method: HttpRequestMethod): Route =
-    path(pathMatch) {
-      method.asMethodDirective {
-        FilterChain(BasicAuthPreFilter("password"), LoadBalancedHttpBackend(balancer), NoOpPostFilter)
+  val route = pathSingleSlash {
+    get {
+      withPreFilter(NoOpPreFilter) {
+        withPreFilter(NoOpPreFilter) {
+          complete(OK -> "<h1>Get request with akka-http</h1>")
+        }
       }
     }
+  }
 
-  val routes: Route = route("foo", Get)
+  val service = Gateway(route)
 
-  Http().bindAndHandle(routes, interface = "localhost", port = 8080)
-}
-
-sealed trait DefaultImplicits {
-  implicit val system: ActorSystem = ActorSystem()
-  implicit val materializer: ActorMaterializer = ActorMaterializer()
-  implicit val executionContext: ExecutionContext = system.dispatcher
-  implicit val http: HttpExt = Http(system)
+  service.start("localhost", 8080)
 }

@@ -13,7 +13,7 @@ import scala.concurrent.Future
   * @param transformer A [[RequestTransformer]]
   */
 class RequestTransformingPreFilter(transformer: RequestTransformer) extends ComposablePreFilter {
-  def apply(request: HttpRequest): Future[Either[HttpResponse, HttpRequest]] =
+  def onRequest(request: HttpRequest): Future[Either[HttpResponse, HttpRequest]] =
     continue(transformer.transform(request))
 }
 

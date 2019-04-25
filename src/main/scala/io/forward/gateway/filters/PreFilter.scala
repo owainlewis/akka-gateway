@@ -16,7 +16,7 @@ trait PreFilter {
     *
     * @return Either a [[HttpResponse]] or a [[HttpRequest]]
     */
-  def apply(request: HttpRequest): Future[Either[HttpResponse, HttpRequest]]
+  def onRequest(request: HttpRequest): Future[Either[HttpResponse, HttpRequest]]
   /**
     * Abort a request chain by immediately exiting and returning a response.
     *
@@ -39,6 +39,6 @@ trait PreFilter {
 }
 
 object NoOpPreFilter extends PreFilter {
-  def apply(request: HttpRequest): Future[Either[HttpResponse, HttpRequest]] =
+  def onRequest(request: HttpRequest): Future[Either[HttpResponse, HttpRequest]] =
     continue(request)
 }

@@ -5,10 +5,16 @@ import akka.http.scaladsl.model.HttpResponse
 import scala.concurrent.Future
 
 trait PostFilter {
-  def apply(response: HttpResponse, body: String): Future[HttpResponse]
+  /**
+    * Applies a filter to a [[HttpResponse]]
+    *
+    * @param response The [[HttpResponse]] to modify
+    * @param body An entity unmarshalled body
+    */
+  def onResponse(response: HttpResponse, body: String): Future[HttpResponse]
 }
 
 object NoOpPostFilter extends PostFilter {
-  override def apply(response: HttpResponse, body: String): Future[HttpResponse] =
+  override def onResponse(response: HttpResponse, body: String): Future[HttpResponse] =
     Future.successful(response)
 }
