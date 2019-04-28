@@ -2,7 +2,7 @@ package io.forward.gateway.filters
 
 import akka.http.scaladsl.model.{HttpRequest, HttpResponse}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 trait PreFilter {
   /**
@@ -36,6 +36,19 @@ trait PreFilter {
     * @return Either a [[HttpResponse]] or a [[HttpRequest]]
     */
   def continue(request: HttpRequest): Future[Either[HttpResponse, HttpRequest]] = Future.successful(Right(request))
+  /**
+    * Compose multiple pre-filters into one
+    *
+    * @param filter A pre-filter to compose
+    * @param ec An implicit concurrent [[ExecutionContext]]
+    * @return A [[PreFilter]] that will run A -> B in sequence
+    */
+  def ~>(filter: PreFilter)(implicit ec: ExecutionContext): PreFilter = { req: HttpRequest => {
+    this.onRequest(req) flatMap {
+      case Right(request) => filter.onRequest(request)
+      case Left(response) => abort(response)
+    }}
+  }
 }
 
 object NoOpPreFilter extends PreFilter {

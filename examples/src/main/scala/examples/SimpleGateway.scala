@@ -1,11 +1,10 @@
 package examples
 
 import akka.actor.ActorSystem
-import io.forward.gateway.Gateway
 import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
-import io.forward.gateway.proxy.Client
-import akka.http.scaladsl.model.StatusCodes._
+import io.forward.gateway.Gateway
+import io.forward.gateway.core.backend.HttpBackend
 import io.forward.gateway.filters.NoOpPreFilter
 
 import scala.concurrent.ExecutionContext
@@ -15,16 +14,15 @@ object SimpleGateway extends App {
   implicit val mat: ActorMaterializer = ActorMaterializer()
   implicit val executionContext: ExecutionContext = system.dispatcher
 
-  import io.forward.gateway.filters.FilterDirectives._
+  import io.forward.gateway.directives.Filter._
+  import io.forward.gateway.directives.Proxy._
 
-  val client = new Client("http://dummy.restapiexample.com/api/v1/employees")
+  val backend = new HttpBackend("https://fakerestapi.azurewebsites.net/api/Books")
 
   val route = pathSingleSlash {
     get {
       withPreFilter(NoOpPreFilter) {
-        withPreFilter(NoOpPreFilter) {
-          complete(OK -> "<h1>Get request with akka-http</h1>")
-        }
+        complete("OK")
       }
     }
   }
