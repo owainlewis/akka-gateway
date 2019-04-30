@@ -1,4 +1,4 @@
-package io.forward.gateway.core.backend
+package io.forward.gateway.model
 
 import akka.http.scaladsl.model.{HttpRequest, HttpResponse}
 

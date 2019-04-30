@@ -2,8 +2,8 @@ package io.forward.gateway.directives
 
 import akka.http.scaladsl.model.{HttpRequest, HttpResponse}
 import akka.http.scaladsl.server.{Directive, Directive0, Directive1}
-import io.forward.gateway.filters.{PostFilter, PreFilter}
 import akka.http.scaladsl.server.Directives._
+import io.forward.gateway.model.{PostFilter, PreFilter}
 
 import scala.concurrent.ExecutionContext
 
@@ -16,7 +16,7 @@ object Filter {
     *
     * val f3 = f1 & f2
     *
-    * @param filter A [[io.forward.gateway.filters.PreFilter]] to apply to a request
+    * @param filter A [[PreFilter]] to apply to a request
     * @return
     */
   def withPreFilter(filter: PreFilter): Directive0 =

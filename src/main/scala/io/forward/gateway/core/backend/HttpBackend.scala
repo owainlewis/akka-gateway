@@ -5,16 +5,20 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.headers.{Host, `Timeout-Access`}
 import akka.http.scaladsl.model.{HttpRequest, HttpResponse, Uri}
 import akka.stream.Materializer
+import io.forward.gateway.model.Backend
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 
-class HttpBackend(target: Uri, entityTimeout: FiniteDuration = 10.seconds)
-                 (implicit system: ActorSystem, ex: ExecutionContext, mat: Materializer) extends Backend {
+class HttpBackend(target: Uri, entityTimeout: FiniteDuration = 10.seconds)(implicit system: ActorSystem, ex: ExecutionContext, materializer: Materializer) extends Backend {
   /**
-    * Dispatch a request and return the response
+    * Apply all request filters, dispatch the request and run response filters when appropriate
     *
     * @param request A HTTP request to proxy
+    * @param system
+    * @param ex
+    * @param materializer
+    * @return
     */
   def apply(request: HttpRequest): Future[HttpResponse] =
     Http(system).singleRequest(address(request))

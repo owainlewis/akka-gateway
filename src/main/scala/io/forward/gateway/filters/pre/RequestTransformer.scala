@@ -1,4 +1,4 @@
-package io.forward.gateway.filters.pre.transform
+package io.forward.gateway.filters.pre
 
 import akka.http.scaladsl.model.HttpRequest
 

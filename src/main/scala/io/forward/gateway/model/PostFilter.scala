@@ -1,4 +1,4 @@
-package io.forward.gateway.filters
+package io.forward.gateway.model
 
 import akka.http.scaladsl.model.HttpResponse
 

@@ -1,5 +1,6 @@
 package io.forward.gateway.core.backend
 import akka.http.scaladsl.model.{HttpRequest, HttpResponse}
+import io.forward.gateway.model.Backend
 
 import scala.concurrent.Future
 
