@@ -68,3 +68,27 @@ trait ResponseFilter {
   def apply(request: HttpRequest, response: HttpResponse, data: RequestData): Future[HttpResponse]
 }
 ```
+
+### Writing custom filters
+
+It's easy to extend this project and add additional filters. Here's a simple request filter that adds HTTP headers to all requests
+
+```
+final class AddHeaders(headers: HttpHeader*) extends RequestFilter {
+  def onRequest(request: HttpRequest): Future[Either[HttpResponse, HttpRequest]] = {
+    val requestWithAdditionalHeaders = headers.foldLeft(request)((r,v) => r.addHeader(v))
+    continue(requestWithAdditionalHeaders)
+  }
+}
+```
+
+We can use that in our gateway as follows
+
+```
+val route =
+  get {
+    withRequestFilters(new AddHeaders(RawHeader("X-Foo", "Bar"))) {
+      proxy(new HttpBackend("https://postman-echo.com/get"))
+    }
+  }
+```

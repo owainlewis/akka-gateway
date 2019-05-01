@@ -5,10 +5,17 @@ import io.forward.gateway.model.RequestFilter
 
 import scala.concurrent.Future
 
+/**
+  * A filter that will remove HTTP headers from an incoming request
+  *
+  * @param headers A sequence of headers to strip out
+  */
 final class RemoveHeaders(headers: Seq[String]) extends RequestFilter {
   def onRequest(request: HttpRequest): Future[Either[HttpResponse, HttpRequest]] = {
-    val requestHeaders = request.headers
-    continue(request.withHeaders(requestHeaders.filterNot(p => headers.map(_.toLowerCase()).contains(p.lowercaseName()))))
+    val desiredHeaders = request.headers.filterNot { p =>
+      headers.map(_.toLowerCase()).contains(p.lowercaseName())
+    }
+    continue(request.withHeaders(desiredHeaders))
   }
 }
 
