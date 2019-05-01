@@ -1,6 +1,8 @@
 package io.forward.gateway.model
 
 import akka.http.scaladsl.model.{HttpRequest, HttpResponse}
+import akka.http.scaladsl.server.Directive0
+import io.forward.gateway.directives.Filter
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -49,6 +51,12 @@ trait RequestFilter {
       case Left(response) => abort(response)
     }}
   }
+  /**
+    * Lift a filter up to a directive for easy composition DSL
+    *
+    * @return A request filter directive
+    */
+  def lift: Directive0 = Filter.withRequestFilter(this)
 }
 
 object NoOpPreFilter extends RequestFilter {
