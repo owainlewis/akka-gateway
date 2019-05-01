@@ -19,7 +19,7 @@ object SimpleGateway extends App {
   import io.forward.gateway.directives.Filter._
   import io.forward.gateway.directives.Proxy._
 
-  val headerFilter = RemoveHeaders(Seq("Authorization"))
+  val headerFilter = new RemoveHeaders("Authorization")
 
   val route = pathSingleSlash {
     // HTTP example
