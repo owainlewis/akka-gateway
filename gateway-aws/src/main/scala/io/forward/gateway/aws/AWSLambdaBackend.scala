@@ -26,7 +26,7 @@ final class AWSLambdaBackend(region: String, accessKey: String, secretKey: Strin
     val client = buildAWSClient()
     Unmarshal(request.entity).to[String] map { payload =>
       val lambdaResponse = client.invoke(new InvokeRequest()
-        .withFunctionName("helloFunction")
+        .withFunctionName(functionName)
         .withPayload(payload))
       toHttpResponse(lambdaResponse)
     }

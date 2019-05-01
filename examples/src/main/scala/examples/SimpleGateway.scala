@@ -7,7 +7,7 @@ import com.amazonaws.regions.Regions
 import io.forward.gateway.Gateway
 import io.forward.gateway.aws.AWSLambdaBackend
 import io.forward.gateway.core.backend.HttpBackend
-import io.forward.gateway.filters.request.RemoveHeaders
+import io.forward.gateway.filters.request._
 
 import scala.concurrent.ExecutionContext
 
@@ -18,14 +18,19 @@ object SimpleGateway extends App {
 
   import io.forward.gateway.directives.Filter._
   import io.forward.gateway.directives.Proxy._
+  import io.forward.gateway.directives._
 
-  val headerFilter = new RemoveHeaders("Authorization")
+  val requestFilter = new RemoveHeadersRequestFilter("Authorization")
+
+  val corsConfiguration = CorsConfiguration().withAllowOrigin("*").withAllowMethods("GET", "PUT")
 
   val route = pathSingleSlash {
-    // HTTP example
-    get {
-      withRequestFilters(headerFilter) {
-        proxy(new HttpBackend("https://postman-echo.com/get"))
+    new CorsHandler(corsConfiguration).withCors {
+      // HTTP example
+      get {
+        withRequestFilters(requestFilter) {
+          proxy(new HttpBackend("https://postman-echo.com/get"))
+        }
       }
     }
     // Lambda function example

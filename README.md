@@ -12,7 +12,17 @@ sbt "project examples" "run
 ## Supported Backends
 
 - HTTP
-- AWS Lambda
+- AWS
+  * Lambda
+  * S3
+- Google
+  * Cloud Functions
+
+## Supported Features
+
+- CORS
+- Authentication
+- Validation
 
 ## Getting started
 

@@ -1,11 +1,12 @@
 package io.forward.gateway.directives
 
 import akka.http.scaladsl.model.{HttpRequest, HttpResponse}
-import akka.http.scaladsl.server.{Directive, Directive0, Directive1}
+import akka.http.scaladsl.server.{Directive, Directive0, Directive1, RouteResult}
 import akka.http.scaladsl.server.Directives._
-import io.forward.gateway.model.{ResponseFilter, RequestFilter}
+import akka.http.scaladsl.server.RouteResult.Complete
+import io.forward.gateway.model.{RequestFilter, ResponseFilter}
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 object Filter {
   /**
@@ -14,14 +15,16 @@ object Filter {
     * @param filters A sequence of request filters to compose together
     * @return A routing [[Directive]]
     */
-  def withRequestFilters(filters: RequestFilter*): Directive0 = filters.map(withRequestFilter).reduce(_ & _)
+  def withRequestFilters(filters: RequestFilter*): Directive0 =
+    filters.map(withRequestFilter).reduce(_ & _)
 
   /**
     * Allow multiple response filters to be composed together in sequence
     *
     * @param filters A sequence of response filters to compose together
     */
-  def withResponseFilters(filters: ResponseFilter*): Directive0 = filters.map(withResponseFilter).reduce(_ & _)
+  def withResponseFilters(filters: ResponseFilter*): Directive0 =
+    filters.map(withResponseFilter).reduce(_ & _)
 
   /**
     * Using the withPreFilter directive you can compose prefilters using the & operator
@@ -41,13 +44,22 @@ object Filter {
     }
 
   /**
-    * Apply a [[ResponseFilter]] to A [[HttpResponse]]
+    * Apply a [[ResponseFilter]] to a [[HttpResponse]]
     *
     * @param filter a [[ResponseFilter]]
     * @return
     */
   def withResponseFilter(filter: ResponseFilter): Directive0 = {
-    complete("OK")
+    Directive { inner => ctx =>
+      implicit val ec: ExecutionContext = ctx.executionContext
+      inner(())(ctx).flatMap {
+        case completeResult: Complete =>
+          filter.onResponse(completeResult.response) map { filteredResponse =>
+            RouteResult.Complete(filteredResponse)
+          }
+        case incompleteResult => Future.successful(incompleteResult)
+      }
+    }
   }
 
   private def applyRequestFilter(filter: RequestFilter): Directive1[Either[HttpResponse, HttpRequest]] = {

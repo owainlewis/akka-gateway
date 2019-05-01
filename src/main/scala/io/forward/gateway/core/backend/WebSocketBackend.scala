@@ -6,7 +6,7 @@ import scala.concurrent.Future
 
 final class WebSocketBackend extends Backend {
 
-  private val WebSocketHeaders = Set(
+  private val WebSocketHeaders: Set[String] = Set(
     "Sec-WebSocket-Accept",
     "Sec-WebSocket-Version",
     "Sec-WebSocket-Key",

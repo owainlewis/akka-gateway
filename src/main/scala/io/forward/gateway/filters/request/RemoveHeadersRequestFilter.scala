@@ -10,7 +10,7 @@ import scala.concurrent.Future
   *
   * @param headers A sequence of headers to strip out
   */
-final class RemoveHeaders(headers: String*) extends RequestFilter {
+final class RemoveHeadersRequestFilter(headers: String*) extends RequestFilter {
   def onRequest(request: HttpRequest): Future[Either[HttpResponse, HttpRequest]] = {
     val desiredHeaders = request.headers.filterNot { p =>
       headers.map(_.toLowerCase()).contains(p.lowercaseName())
