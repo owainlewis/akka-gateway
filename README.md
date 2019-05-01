@@ -1,6 +1,6 @@
 # Gateway
 
-Gateway is a library for writing bespoke API Gateways using Akkaa HTTP. It follows a very simple request response pipeline flow.
+Gateway is a library for writing bespoke API Gateways using Akka HTTP. It follows a very simple request response pipeline flow.
 You can add request and response filters to modify incoming requests, perform validation, transform responses, perform authentication and more.
 
 ## Running the examples
