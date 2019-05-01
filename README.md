@@ -1,6 +1,7 @@
 # Gateway
 
-Gateway is a library for writing bespoke API Gateways using Akka HTTP.
+Gateway is a library for writing bespoke API Gateways using Akkaa HTTP. It follows a very simple request response pipeline flow.
+You can add request and response filters to modify incoming requests, perform validation, transform responses, perform authentication and more.
 
 ## Running the examples
 
@@ -8,15 +9,10 @@ Gateway is a library for writing bespoke API Gateways using Akka HTTP.
 sbt "project examples" "run
 ```
 
-## Features
+## Supported Backends
 
-TBD
-
-## Concepts
-
-Gateway is built around some simple concepts.
-
-HTTPRequest -> PreFilter[HttpRequest] -> (Return || Dispatch Upstream) -> PostFilter[HttpResponse] -> HttpResponse
+- HTTP
+- AWS Lambda
 
 ## Getting started
 
@@ -53,20 +49,20 @@ object SimpleGateway extends App {
 
 ### Request Filters
 
-A pre filter can be used to modify an incoming HTTP request before it is sent upstream. It can also perform logic such as
+A request filter can be used to modify an incoming HTTP request before it is sent upstream. It can also perform logic such as
 authentication.
 
 ```scala
-trait PreFilter {
+trait RequestFilter {
   def apply(request: HttpRequest): Future[Either[HttpResponse, HttpRequest]]
 ```
 
 ### Response Filters
 
-A post filter is used to modify the HTTP response received from a Backend. For example you might want to modify headers or response messages.
+A response filter is used to modify the HTTP response received from a Backend. For example you might want to modify headers or response messages.
 
 ```scala
-trait PostFilter[-RequestData] {
+trait ResponseFilter {
   def apply(request: HttpRequest, response: HttpResponse, data: RequestData): Future[HttpResponse]
 }
 ```

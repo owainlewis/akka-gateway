@@ -3,7 +3,9 @@ package examples
 import akka.actor.ActorSystem
 import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
+import com.amazonaws.regions.Regions
 import io.forward.gateway.Gateway
+import io.forward.gateway.aws.AWSLambdaBackend
 import io.forward.gateway.core.backend.HttpBackend
 import io.forward.gateway.filters.request.RemoveHeaders
 
@@ -17,15 +19,19 @@ object SimpleGateway extends App {
   import io.forward.gateway.directives.Filter._
   import io.forward.gateway.directives.Proxy._
 
-  val backend = new HttpBackend("https://postman-echo.com/get")
-
   val headerFilter = RemoveHeaders(Seq("Authorization"))
 
   val route = pathSingleSlash {
+    // HTTP example
     get {
       withRequestFilters(headerFilter) {
-        proxy(backend)
+        proxy(new HttpBackend("https://postman-echo.com/get"))
       }
+    }
+    // Lambda function example
+  } ~ path("v1") {
+    post {
+      proxy(new AWSLambdaBackend(Regions.EU_WEST_1.getName, System.getenv("AWS_KEY"), System.getenv("AWS_SECRET"), "helloFunction"))
     }
   }
 

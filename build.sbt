@@ -20,13 +20,24 @@ lazy val commonSettings = Seq(
 
 lazy val examples =
   (project in file("examples"))
-    .dependsOn(core)
+    .dependsOn(core, aws)
     .settings(commonSettings: _*)
     .settings(
       name := "gateway-example",
       libraryDependencies ++= Seq(
     )
   )
+
+lazy val aws =
+  (project in file("gateway-aws"))
+    .dependsOn(core)
+    .settings(commonSettings: _*)
+    .settings(
+      name := "gateway-aws",
+      libraryDependencies ++= Seq(
+        "com.amazonaws" % "aws-java-sdk" % "1.11.542"
+      )
+    )
 
 lazy val core =
   (project in file("."))

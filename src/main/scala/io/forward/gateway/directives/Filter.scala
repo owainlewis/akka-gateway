@@ -9,12 +9,19 @@ import scala.concurrent.ExecutionContext
 
 object Filter {
   /**
-    * Takes multiple filters, lifts and then combines the into one
+    * ALlow multiple request filters to be composed together in sequence
     *
     * @param filters A sequence of request filters to compose together
     * @return A routing [[Directive]]
     */
-  def withRequestFilters(filters: RequestFilter*): Directive0 = filters.toSeq.map(withRequestFilter).reduce(_ & _)
+  def withRequestFilters(filters: RequestFilter*): Directive0 = filters.map(withRequestFilter).reduce(_ & _)
+
+  /**
+    * Allow multiple response filters to be composed together in sequence
+    *
+    * @param filters A sequence of response filters to compose together
+    */
+  def withResponseFilters(filters: ResponseFilter*): Directive0 = filters.map(withResponseFilter).reduce(_ & _)
 
   /**
     * Using the withPreFilter directive you can compose prefilters using the & operator
