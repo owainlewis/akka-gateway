@@ -73,7 +73,7 @@ trait ResponseFilter {
 
 It's easy to extend this project and add additional filters. Here's a simple request filter that adds HTTP headers to all requests
 
-```
+```scala
 final class AddHeaders(headers: HttpHeader*) extends RequestFilter {
   def onRequest(request: HttpRequest): Future[Either[HttpResponse, HttpRequest]] = {
     val requestWithAdditionalHeaders = headers.foldLeft(request)((r,v) => r.addHeader(v))
@@ -84,7 +84,7 @@ final class AddHeaders(headers: HttpHeader*) extends RequestFilter {
 
 We can use that in our gateway as follows
 
-```
+```scala
 val route =
   get {
     withRequestFilters(new AddHeaders(RawHeader("X-Foo", "Bar"))) {
