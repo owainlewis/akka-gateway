@@ -38,7 +38,7 @@ object SimpleGateway extends App {
 
   val route = pathSingleSlash {
     get {
-      withPreFilter(headerFilter) {
+      withRequestFilters(headerFilter) {
         proxy(backend)
       }
     }
@@ -48,6 +48,7 @@ object SimpleGateway extends App {
 
   service.start("localhost", 8080)
 }
+
 ```
 
 ### Request Filters
