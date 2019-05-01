@@ -4,12 +4,12 @@ import akka.http.scaladsl.model.{HttpRequest, HttpResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait PreFilter {
+trait RequestFilter {
   /**
     * Apply a pre-filter to a [[HttpRequest]]. If a [[HttpResponse]] is returned
     * then that is immediately passed back to the caller and not sent upstream.
     *
-    * If a [[HttpRequest]] is returned it will be sent upstream or to another [[PreFilter]] for further
+    * If a [[HttpRequest]] is returned it will be sent upstream or to another [[RequestFilter]] for further
     * processing.
     *
     * @param request An incoming [[HttpRequest]] destined for an upstream
@@ -41,9 +41,9 @@ trait PreFilter {
     *
     * @param filter A pre-filter to compose
     * @param ec An implicit concurrent [[ExecutionContext]]
-    * @return A [[PreFilter]] that will run A -> B in sequence
+    * @return A [[RequestFilter]] that will run A -> B in sequence
     */
-  def ~>(filter: PreFilter)(implicit ec: ExecutionContext): PreFilter = { req: HttpRequest => {
+  def ~>(filter: RequestFilter)(implicit ec: ExecutionContext): RequestFilter = { req: HttpRequest => {
     this.onRequest(req) flatMap {
       case Right(request) => filter.onRequest(request)
       case Left(response) => abort(response)
@@ -51,7 +51,7 @@ trait PreFilter {
   }
 }
 
-object NoOpPreFilter extends PreFilter {
+object NoOpPreFilter extends RequestFilter {
   def onRequest(request: HttpRequest): Future[Either[HttpResponse, HttpRequest]] =
     continue(request)
 }

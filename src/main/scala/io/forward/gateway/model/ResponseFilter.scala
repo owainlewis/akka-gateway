@@ -4,7 +4,7 @@ import akka.http.scaladsl.model.HttpResponse
 
 import scala.concurrent.Future
 
-trait PostFilter {
+trait ResponseFilter {
   /**
     * Applies a filter to a [[HttpResponse]]
     *
@@ -14,7 +14,7 @@ trait PostFilter {
   def onResponse(response: HttpResponse, body: String): Future[HttpResponse]
 }
 
-object NoOpPostFilter extends PostFilter {
+object NoOpPostFilter extends ResponseFilter {
   override def onResponse(response: HttpResponse, body: String): Future[HttpResponse] =
     Future.successful(response)
 }

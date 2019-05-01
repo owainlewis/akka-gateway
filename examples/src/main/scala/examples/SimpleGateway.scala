@@ -5,7 +5,7 @@ import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
 import io.forward.gateway.Gateway
 import io.forward.gateway.core.backend.HttpBackend
-import io.forward.gateway.filters.pre.RemoveHeaders
+import io.forward.gateway.filters.request.RemoveHeaders
 
 import scala.concurrent.ExecutionContext
 
@@ -23,7 +23,7 @@ object SimpleGateway extends App {
 
   val route = pathSingleSlash {
     get {
-      withPreFilter(headerFilter) {
+      withRequestFilters(headerFilter) {
         proxy(backend)
       }
     }

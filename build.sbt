@@ -35,14 +35,14 @@ lazy val core =
     name := "gateway-core",
     publishMavenStyle := true,
     libraryDependencies ++= Seq(
-      "com.typesafe.akka" %% "akka-http"      % akkaHttpVersion,
-      "com.typesafe.akka" %% "akka-actor"     % akkaVersion,
-      "com.typesafe.akka" %% "akka-stream"    % akkaVersion,
-      "org.typelevel"     %% "cats-core"      % catsVersion,
-      "io.circe"          %% "circe-core"     % circeVersion,
-      "io.circe"          %% "circe-generic"  % circeVersion,
-       "org.scalatest"    %% "scalatest"      % "3.0.5"        % testScope
+      "com.typesafe.akka"  %% "akka-http"           % akkaHttpVersion,
+      "com.typesafe.akka"  %% "akka-actor"          % akkaVersion,
+      "com.typesafe.akka"  %% "akka-stream"         % akkaVersion,
+      "org.typelevel"      %% "cats-core"           % catsVersion,
+      "io.circe"           %% "circe-core"          % circeVersion,
+      "io.circe"           %% "circe-generic"       % circeVersion,
+      "org.scalatest"      %% "scalatest"           % "3.0.5" % testScope,
+      "com.typesafe.akka"  %% "akka-http-testkit"   % akkaHttpVersion % testScope,
+      "com.typesafe.akka"  %% "akka-stream-testkit" % akkaVersion % testScope
     )
   )
-
-mainClass in run := Some("examples.Application")

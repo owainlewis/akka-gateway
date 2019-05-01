@@ -3,39 +3,47 @@ package io.forward.gateway.directives
 import akka.http.scaladsl.model.{HttpRequest, HttpResponse}
 import akka.http.scaladsl.server.{Directive, Directive0, Directive1}
 import akka.http.scaladsl.server.Directives._
-import io.forward.gateway.model.{PostFilter, PreFilter}
+import io.forward.gateway.model.{ResponseFilter, RequestFilter}
 
 import scala.concurrent.ExecutionContext
 
 object Filter {
   /**
+    * Takes multiple filters, lifts and then combines the into one
+    *
+    * @param filters A sequence of request filters to compose together
+    * @return A routing [[Directive]]
+    */
+  def withRequestFilters(filters: RequestFilter*): Directive0 = filters.toSeq.map(withRequestFilter).reduce(_ & _)
+
+  /**
     * Using the withPreFilter directive you can compose prefilters using the & operator
     *
-    * val f1 = withPreFilter(a)
-    * val f2 = withPreFilter(b)
+    * val f1 = withRequestFilter(a)
+    * val f2 = withRequestFilter(b)
     *
     * val f3 = f1 & f2
     *
-    * @param filter A [[PreFilter]] to apply to a request
+    * @param filter a [[RequestFilter]] to apply to a request
     * @return
     */
-  def withPreFilter(filter: PreFilter): Directive0 =
+  def withRequestFilter(filter: RequestFilter): Directive0 =
     applyRequestFilter(filter).flatMap {
       case Left(response) => complete(response)
       case Right(request) => mapRequest(_ => request)
     }
 
   /**
-    * Apply a post filter to a response
+    * Apply a [[ResponseFilter]] to A [[HttpResponse]]
     *
-    * @param filter A [[PostFilter]]
+    * @param filter a [[ResponseFilter]]
     * @return
     */
-  def withPostFilter(filter: PostFilter): Directive0 = {
+  def withResponseFilter(filter: ResponseFilter): Directive0 = {
     complete("OK")
   }
 
-  private def applyRequestFilter(filter: PreFilter): Directive1[Either[HttpResponse, HttpRequest]] = {
+  private def applyRequestFilter(filter: RequestFilter): Directive1[Either[HttpResponse, HttpRequest]] = {
     Directive { inner => ctx =>
       implicit val ex: ExecutionContext = ctx.executionContext
       filter.onRequest(ctx.request).flatMap { result =>
