@@ -16,8 +16,7 @@ sbt "project examples" "run
 
 ## Getting started
 
-The example below shows how to create a custom API Gateway using Switch. We add some pre filters to modify incoming
-requests before sending them upstream.
+The example below shows how to create a custom API Gateway that dispatches request to a HTTP backend and AWS Lambda function. We apply request filters to modify inbound requests before they are sent upstream. 
 
 ```scala
 object SimpleGateway extends App {
@@ -28,15 +27,19 @@ object SimpleGateway extends App {
   import io.forward.gateway.directives.Filter._
   import io.forward.gateway.directives.Proxy._
 
-  val backend = new HttpBackend("https://postman-echo.com/get")
-
   val headerFilter = RemoveHeaders(Seq("Authorization"))
 
   val route = pathSingleSlash {
+    // HTTP example
     get {
       withRequestFilters(headerFilter) {
-        proxy(backend)
+        proxy(new HttpBackend("https://postman-echo.com/get"))
       }
+    }
+    // Lambda function example
+  } ~ path("v1") {
+    post {
+      proxy(new AWSLambdaBackend(Regions.EU_WEST_1.getName, System.getenv("AWS_KEY"), System.getenv("AWS_SECRET"), "helloFunction"))
     }
   }
 
@@ -44,7 +47,6 @@ object SimpleGateway extends App {
 
   service.start("localhost", 8080)
 }
-
 ```
 
 ### Request Filters
