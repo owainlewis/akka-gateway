@@ -34,16 +34,20 @@ object SimpleGateway extends App {
   implicit val mat: ActorMaterializer = ActorMaterializer()
   implicit val executionContext: ExecutionContext = system.dispatcher
 
-  import io.forward.gateway.directives.Filter._
   import io.forward.gateway.directives.Proxy._
+  import io.forward.gateway.directives._
 
-  val headerFilter = RemoveHeaders(Seq("Authorization"))
+  val removeHeaders = new RemoveHeadersRequestFilter("Authorization").lift
+
+  val corsConfiguration = CorsConfiguration().withAllowOrigin("*").withAllowMethods("GET", "PUT")
 
   val route = pathSingleSlash {
-    // HTTP example
-    get {
-      withRequestFilters(headerFilter) {
-        proxy(new HttpBackend("https://postman-echo.com/get"))
+    new CorsHandler(corsConfiguration).withCors {
+      // HTTP example
+      get {
+        removeHeaders {
+          proxy(new HttpBackend("https://postman-echo.com/get"))
+        }
       }
     }
     // Lambda function example
