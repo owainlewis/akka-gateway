@@ -9,12 +9,12 @@ import akka.http.scaladsl.server.Route
 /**
   * Add CORS to requests using this directive
   *
-  * @param allowOrigin specifies which domain/origin is allowed to access a resource.
-  *                    A wildcard '*' may be used to allow all but this is only recommended for public APIs
-  * @param allowMethods a comma separated list of HTTP methods that are allowed to access a resource. These are used in response to a pre-flight request.
-  *                       The default of Access-Control-Allow-Methods is to allow through all simple methods, even on pre-flight requests
-  * @param allowHeaders a comma separated list of allowed HTTP headers
-  * @param exposeHeaders a comma separated list of HTTP headers the browser is allowed to access
+  * @param allowOrigin      specifies which domain/origin is allowed to access a resource.
+  *                         A wildcard '*' may be used to allow all but this is only recommended for public APIs
+  * @param allowMethods     a comma separated list of HTTP methods that are allowed to access a resource. These are used in response to a pre-flight request.
+  *                         The default of Access-Control-Allow-Methods is to allow through all simple methods, even on pre-flight requests
+  * @param allowHeaders     a comma separated list of allowed HTTP headers
+  * @param exposeHeaders    a comma separated list of HTTP headers the browser is allowed to access
   * @param allowCredentials must be set to true if requests are made with credentials
   * @param maxAge indicates how long (in delta-seconds) the results of a pre-flight request can be cached by a browser
   */
@@ -34,7 +34,6 @@ case class CorsConfiguration(allowOrigin: Option[String] = None,
 }
 
 class CorsHandler(configuration: CorsConfiguration) {
-
   def withCors(r: Route): Route = respondWithHeaders(accessControlHeaders) {
     preFlightRequestHandler ~ r
   }
