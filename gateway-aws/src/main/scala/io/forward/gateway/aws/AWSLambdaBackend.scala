@@ -22,8 +22,10 @@ import scala.concurrent.{ExecutionContext, Future}
   * @param functionName The name of the function to invoke
   */
 final class AWSLambdaBackend(region: String, accessKey: String, secretKey: String, functionName: String)(implicit system: ActorSystem, ctx: ExecutionContext, m: Materializer) extends Backend {
+  
+  private val client = buildAWSClient()
+ 
   def apply(request: HttpRequest): Future[HttpResponse] = {
-    val client = buildAWSClient()
     Unmarshal(request.entity).to[String] map { payload =>
       val lambdaResponse = client.invoke(new InvokeRequest()
         .withFunctionName(functionName)
