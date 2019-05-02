@@ -11,12 +11,14 @@ sbt "project examples" "run
 
 ## Supported Backends
 
-- HTTP
+- HTTP :heavy_check_mark:
 - AWS
-  * Lambda
+  * Lambda :heavy_check_mark:
   * S3
 - Google
   * Cloud Functions
+- Azure
+- Oracle Cloud Infrastructure
 
 ## Supported Features
 
