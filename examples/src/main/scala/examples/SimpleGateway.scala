@@ -37,7 +37,7 @@ object SimpleGateway extends App {
     }
     // Lambda function example
   } ~ path("secret") {
-    authorizer.check("test") {
+    authorizer.authenticateJWT {
       get {
         complete("OK")
       }
