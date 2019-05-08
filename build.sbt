@@ -20,7 +20,7 @@ lazy val commonSettings = Seq(
 
 lazy val examples =
   (project in file("examples"))
-    .dependsOn(core, aws)
+    .dependsOn(core, aws, auth)
     .settings(commonSettings: _*)
     .settings(
       name := "gateway-example",
@@ -37,6 +37,15 @@ lazy val aws =
       libraryDependencies ++= Seq(
         "com.amazonaws" % "aws-java-sdk" % "1.11.542"
       )
+    )
+
+lazy val auth =
+  (project in file("gateway-auth"))
+    .dependsOn(core)
+    .settings(commonSettings: _*)
+    .settings(
+      name := "gateway-auth",
+      libraryDependencies += "com.auth0" % "java-jwt" % "3.8.0"
     )
 
 lazy val core =
