@@ -9,8 +9,11 @@ import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
 
 final class Gateway(routes: Route)(implicit ex: ExecutionContext, system: ActorSystem, mat: ActorMaterializer) {
+  // SSL enabled requires server.p12
+  val ctx = new GatewayTLSContext("password")
+
   def start(host: String, port: Int): Unit = {
-    val bindingFuture = Http().bindAndHandle(routes, host, port)
+    val bindingFuture = Http().bindAndHandle(routes, host, port, connectionContext = ctx.https)
     bindingFuture.onComplete {
       case Success(serverBinding) => println(s"listening to ${serverBinding.localAddress}")
       case Failure(error) => println(s"error: ${error.getMessage}")
