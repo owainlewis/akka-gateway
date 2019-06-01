@@ -5,7 +5,7 @@ import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
 import com.amazonaws.regions.Regions
 import io.forward.gateway.Gateway
-import io.forward.gateway.auth.JWTRequestFilter
+import io.forward.gateway.auth.AWSLambdaAuthorizer
 import io.forward.gateway.aws.AWSLambdaBackend
 import io.forward.gateway.core.backend.HttpBackend
 import io.forward.gateway.filters.request._
@@ -24,7 +24,7 @@ object SimpleGateway extends App {
 
   val corsConfiguration = CorsConfiguration().withAllowOrigin("*").withAllowMethods("GET", "PUT")
 
-  val authorizer = new JWTRequestFilter("test")
+  val authorizer = new AWSLambdaAuthorizer()
 
   val route = pathSingleSlash {
     new CorsHandler(corsConfiguration).withCors {
@@ -35,14 +35,13 @@ object SimpleGateway extends App {
         }
       }
     }
-    // Lambda function example
-  } ~ path("secret") {
-    authorizer.authenticateJWT {
-      get {
-        complete("OK")
+  }  ~ path("secret") {
+      authorizer.authorize {
+        get {
+          complete("OK")
+        }
       }
-    }
-  } ~ path("v1") {
+    } ~ path("v1") {
       post {
         proxy(new AWSLambdaBackend(Regions.EU_WEST_1.getName, System.getenv("AWS_KEY"), System.getenv("AWS_SECRET"), "helloFunction"))
       }
