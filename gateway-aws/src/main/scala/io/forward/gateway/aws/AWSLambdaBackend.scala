@@ -1,15 +1,11 @@
 package io.forward.gateway.aws
 
-import akka.http.scaladsl.model._
-import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
-import com.amazonaws.services.lambda.{AWSLambda, AWSLambdaClientBuilder}
-import com.amazonaws.services.lambda.model.{InvokeRequest, InvokeResult}
-import io.forward.gateway.model.Backend
-import java.nio.charset.StandardCharsets
-
 import akka.actor.ActorSystem
+import akka.http.scaladsl.model._
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.Materializer
+import com.amazonaws.services.lambda.model.InvokeRequest
+import io.forward.gateway.model.Backend
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -21,10 +17,7 @@ import scala.concurrent.{ExecutionContext, Future}
   * @param secretKey An AWS secretAccessKey
   * @param functionName The name of the function to invoke
   */
-final class AWSLambdaBackend(region: String, accessKey: String, secretKey: String, functionName: String)(implicit system: ActorSystem, ctx: ExecutionContext, m: Materializer) extends Backend {
-  
-  private val client = buildAWSClient()
- 
+final class AWSLambdaBackend(val region: String, val accessKey: String, val secretKey: String, functionName: String)(implicit system: ActorSystem, ctx: ExecutionContext, m: Materializer) extends Backend with AWSFunctionInvoker {
   def apply(request: HttpRequest): Future[HttpResponse] = {
     Unmarshal(request.entity).to[String] map { payload =>
       val lambdaResponse = client.invoke(new InvokeRequest()
@@ -33,17 +26,6 @@ final class AWSLambdaBackend(region: String, accessKey: String, secretKey: Strin
       toHttpResponse(lambdaResponse)
     }
   }
-
-  private def toHttpResponse(result: InvokeResult): HttpResponse = {
-    val payload = StandardCharsets.UTF_8.decode(result.getPayload).toString
-    HttpResponse(StatusCode.int2StatusCode(result.getStatusCode), entity = HttpEntity(payload))
-  }
-
-  private def buildAWSClient(): AWSLambda =
-    AWSLambdaClientBuilder.standard()
-      .withCredentials(new AWSStaticCredentialsProvider(new BasicAWSCredentials(accessKey, secretKey)))
-      .withRegion(region)
-      .build()
 }
 
 object AWSLambdaBackend {

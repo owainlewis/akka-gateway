@@ -5,6 +5,7 @@ lazy val akkaHttpVersion = "10.1.8"
 lazy val akkaVersion = "2.5.21"
 lazy val circeVersion = "0.11.1"
 lazy val catsVersion = "1.6.0"
+lazy val awsSDKVersion = "1.11.542"
 ///////////////////////////////////////
 // Scopes
 ///////////////////////////////////////
@@ -39,15 +40,6 @@ lazy val aws =
       )
     )
 
-lazy val auth =
-  (project in file("gateway-auth"))
-    .dependsOn(core)
-    .settings(commonSettings: _*)
-    .settings(
-      name := "gateway-auth",
-      libraryDependencies += "com.auth0" % "java-jwt" % "3.8.0"
-    )
-
 lazy val core =
   (project in file("."))
   .settings(commonSettings: _*)
@@ -61,8 +53,8 @@ lazy val core =
       "org.typelevel"      %% "cats-core"           % catsVersion,
       "io.circe"           %% "circe-core"          % circeVersion,
       "io.circe"           %% "circe-generic"       % circeVersion,
-      "org.scalatest"      %% "scalatest"           % "3.0.5" % testScope,
+      "org.scalatest"      %% "scalatest"           % "3.0.5"         % testScope,
       "com.typesafe.akka"  %% "akka-http-testkit"   % akkaHttpVersion % testScope,
-      "com.typesafe.akka"  %% "akka-stream-testkit" % akkaVersion % testScope
+      "com.typesafe.akka"  %% "akka-stream-testkit" % akkaVersion     % testScope
     )
   )
