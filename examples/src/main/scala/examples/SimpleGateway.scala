@@ -5,10 +5,11 @@ import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
 import com.amazonaws.regions.Regions
 import io.forward.gateway.Gateway
-import io.forward.gateway.auth.AWSLambdaAuthorizer
-import io.forward.gateway.aws.AWSLambdaBackend
+import io.forward.gateway.aws.{AWSLambdaAuthorizer, AWSLambdaBackend}
 import io.forward.gateway.core.backend.HttpBackend
 import io.forward.gateway.filters.request._
+import io.forward.gateway.directives.Proxy._
+import io.forward.gateway.directives._
 
 import scala.concurrent.ExecutionContext
 
@@ -17,14 +18,11 @@ object SimpleGateway extends App {
   implicit val mat: ActorMaterializer = ActorMaterializer()
   implicit val executionContext: ExecutionContext = system.dispatcher
 
-  import io.forward.gateway.directives.Proxy._
-  import io.forward.gateway.directives._
-
   val removeHeaders = new RemoveHeadersRequestFilter("Authorization").lift
 
   val corsConfiguration = CorsConfiguration().withAllowOrigin("*").withAllowMethods("GET", "PUT")
 
-  val authorizer = new AWSLambdaAuthorizer()
+  val authorizer = new AWSLambdaAuthorizer(Regions.EU_WEST_1.getName, System.getenv("AWS_KEY"), System.getenv("AWS_SECRET"), "auth")
 
   val route = pathSingleSlash {
     new CorsHandler(corsConfiguration).withCors {
@@ -41,7 +39,7 @@ object SimpleGateway extends App {
           complete("OK")
         }
       }
-    } ~ path("v1") {
+  } ~ path("v1") {
       post {
         proxy(new AWSLambdaBackend(Regions.EU_WEST_1.getName, System.getenv("AWS_KEY"), System.getenv("AWS_SECRET"), "helloFunction"))
       }
@@ -49,5 +47,5 @@ object SimpleGateway extends App {
 
   val service = Gateway(route)
 
-  service.start("localhost", 3000)
+  service.start("localhost", 3000, tls = false)
 }

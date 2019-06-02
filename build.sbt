@@ -21,7 +21,7 @@ lazy val commonSettings = Seq(
 
 lazy val examples =
   (project in file("examples"))
-    .dependsOn(core, aws, auth)
+    .dependsOn(core, aws)
     .settings(commonSettings: _*)
     .settings(
       name := "gateway-example",

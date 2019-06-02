@@ -12,8 +12,8 @@ final class Gateway(routes: Route)(implicit ex: ExecutionContext, system: ActorS
   // SSL enabled requires server.p12
   val ctx = new GatewayTLSContext("password")
 
-  def start(host: String, port: Int): Unit = {
-    val bindingFuture = Http().bindAndHandle(routes, host, port, connectionContext = ctx.https)
+  def start(host: String, port: Int, tls: Boolean = false): Unit = {
+    val bindingFuture = if (tls) { Http().bindAndHandle(routes, host, port, connectionContext = ctx.https) } else { Http().bindAndHandle(routes, host, port) }
     bindingFuture.onComplete {
       case Success(serverBinding) => println(s"listening to ${serverBinding.localAddress}")
       case Failure(error) => println(s"error: ${error.getMessage}")
