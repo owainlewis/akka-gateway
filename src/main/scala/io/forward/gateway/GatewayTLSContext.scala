@@ -6,8 +6,9 @@ import javax.net.ssl.{ SSLContext, TrustManagerFactory, KeyManagerFactory }
 import akka.http.scaladsl.{ ConnectionContext, HttpsConnectionContext}
 
 final class GatewayTLSContext(password: String) {
-  private val ks = getKeyStore("serer.p12", password)
+  private val ks = getKeyStore("server.p12", password)
   private val sslContext = getSSLContext(password)
+  private val sunX509 = "SunX509"
 
   val https: HttpsConnectionContext = ConnectionContext.https(sslContext)
 
@@ -18,10 +19,10 @@ final class GatewayTLSContext(password: String) {
   }
 
   private def getSSLContext(password: String): SSLContext = {
-    val keyManagerFactory: KeyManagerFactory = KeyManagerFactory.getInstance("SunX509")
+    val keyManagerFactory: KeyManagerFactory = KeyManagerFactory.getInstance(sunX509)
     keyManagerFactory.init(ks, password.toCharArray)
 
-    val tmf: TrustManagerFactory = TrustManagerFactory.getInstance("SunX509")
+    val tmf: TrustManagerFactory = TrustManagerFactory.getInstance(sunX509)
     tmf.init(ks)
 
     val sslContext: SSLContext = SSLContext.getInstance("TLS")
