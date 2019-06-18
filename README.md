@@ -73,11 +73,12 @@ authentication.
 ```scala
 trait RequestFilter {
   def onRequest(request: HttpRequest): Future[Either[HttpResponse, HttpRequest]]
+}
 ```
 
 ### Response Filters
 
-A response filter is used to modify the HTTP response received from a Backend. For example you might want to modify headers or response messages.
+A response filter is used to modify the HTTP response received from a Backend. For example you might want to modify headers or response message before returning to a user.
 
 ```scala
 trait ResponseFilter {
