@@ -72,7 +72,7 @@ authentication.
 
 ```scala
 trait RequestFilter {
-  def apply(request: HttpRequest): Future[Either[HttpResponse, HttpRequest]]
+  def onRequest(request: HttpRequest): Future[Either[HttpResponse, HttpRequest]]
 ```
 
 ### Response Filters
@@ -81,7 +81,7 @@ A response filter is used to modify the HTTP response received from a Backend. F
 
 ```scala
 trait ResponseFilter {
-  def apply(request: HttpRequest, response: HttpResponse, data: RequestData): Future[HttpResponse]
+  def onResponse(response: HttpResponse): Future[HttpResponse]
 }
 ```
 
