@@ -10,7 +10,7 @@ import io.forward.gateway.model.Backend
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 
-final class HttpBackend(target: Uri, entityTimeout: FiniteDuration = 10.seconds)(implicit system: ActorSystem, ex: ExecutionContext, materializer: Materializer) extends Backend {
+final class HttpBackend(target: Uri)(implicit system: ActorSystem, ex: ExecutionContext, materializer: Materializer) extends Backend {
   /**
     * Apply all request filters, dispatch the request and run response filters when appropriate
     *
