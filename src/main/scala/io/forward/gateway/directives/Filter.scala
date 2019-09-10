@@ -10,7 +10,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 object Filter {
   /**
-    * ALlow multiple request filters to be composed together in sequence
+    * Allow multiple request filters to be composed together in sequence
     *
     * @param filters A sequence of request filters to compose together
     * @return A routing [[Directive]]
