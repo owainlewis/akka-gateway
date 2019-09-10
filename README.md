@@ -59,9 +59,7 @@ object SimpleGateway extends App {
     }
   }
 
-  val service = Gateway(route)
-
-  service.start("localhost", 8080)
+  Gateway(route).start("localhost", 8080)
 }
 ```
 
