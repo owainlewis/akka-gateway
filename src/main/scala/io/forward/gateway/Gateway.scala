@@ -22,5 +22,7 @@ final class Gateway(routes: Route)(implicit ex: ExecutionContext, system: ActorS
 }
 
 object Gateway {
-  def apply(routes: Route)(implicit ex: ExecutionContext, system: ActorSystem, mat: ActorMaterializer): Gateway = new Gateway(routes)
+  def apply(routes: Route)
+  (implicit ex: ExecutionContext, system: ActorSystem, mat: ActorMaterializer): Gateway = 
+    new Gateway(routes)
 }
