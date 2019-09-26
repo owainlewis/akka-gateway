@@ -91,8 +91,8 @@ It's easy to extend this project and add additional filters. Here's a simple req
 ```scala
 final class AddHeaders(headers: HttpHeader*) extends RequestFilter {
   def onRequest(request: HttpRequest): Future[Either[HttpResponse, HttpRequest]] = {
-    val requestWithAdditionalHeaders = headers.foldLeft(request)((r,v) => r.addHeader(v))
-    continue(requestWithAdditionalHeaders)
+    // Add headers before request is dispatched to backend
+    continue(headers.foldLeft(request)((r,v) => r.addHeader(v)))
   }
 }
 ```
