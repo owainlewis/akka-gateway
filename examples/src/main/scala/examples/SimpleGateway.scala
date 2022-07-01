@@ -19,9 +19,7 @@ object SimpleGateway extends App {
   implicit val executionContext: ExecutionContext = system.dispatcher
 
   val removeHeaders = new RemoveHeadersRequestFilter("Authorization").lift
-
   val corsConfiguration = CorsConfiguration().withAllowOrigin("*").withAllowMethods("GET", "PUT")
-
   val authorizer = new AWSLambdaAuthorizer(Regions.EU_WEST_1.getName, System.getenv("AWS_KEY"), System.getenv("AWS_SECRET"), "auth")
 
   val route = pathSingleSlash {
